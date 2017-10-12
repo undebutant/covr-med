@@ -2,54 +2,64 @@
 using System.Collections;
 using UnityEngine.Networking;
 
+
 public class NetworkVariable : NetworkBehaviour {
 
     [SyncVar]
-    public int colorUpRedA1;
+    public int alphaValueUpServer;
     
-    public int colorUpRedA2;
+    public int alphaValueUpClient;
+
 
     [SyncVar]
-    public int colorDownRedA1;
+    public int alphaValueDownServer;
    
-    public int colorDownRedA2;
+    public int alphaValueDownClient;
+
+
     [SyncVar]
-    public int colorLeftRedA1;
+    public int alphaValueLeftServer;
     
-    public int colorLeftRedA2;
+    public int alphaValueLeftClient;
+
+
     [SyncVar]
-    public int colorRightRedA1;
+    public int alphaValueRightServer;
     
-    public int colorRightRedA2;
-
-
-    [Command]
-    public void CmdClient(int up,int down,int right, int left) {
-        RpcUp(up, down, right, left);
-    }
-
-    [ClientRpc]
-    void RpcUp(int up, int down, int right, int left) {
-        colorUpRedA2=up;
-        colorDownRedA2 = down;
-        colorLeftRedA2 = left;
-        colorRightRedA2 = right;
-    }
+    public int alphaValueRightClient;
 
 
 
-
-    // Use this for initialization
     void Start() {
-        colorUpRedA1 = 0;
-        colorUpRedA2 = 0;
-        colorDownRedA1 = 0;
-        colorDownRedA2 = 0;
-        colorLeftRedA1 = 0;
-        colorLeftRedA2 = 0;
-        colorRightRedA1 = 0;
-        colorRightRedA2 = 0;
+        alphaValueUpServer = 0;
+        alphaValueUpClient = 0;
+
+        alphaValueDownServer = 0;
+        alphaValueDownClient = 0;
+
+        alphaValueLeftServer = 0;
+        alphaValueLeftClient = 0;
+
+        alphaValueRightServer = 0;
+        alphaValueRightClient = 0;
     }
-	
-	
+
+
+
+    // Defining a method callable by the client, to update synced variables on the server
+    [Command]
+    public void CmdClient(int upValue, int downValue, int rightValue, int leftValue) {
+        // Calling the sync method server side, to make other instances aware of the updated variables
+        RpcUp(upValue, downValue, rightValue, leftValue);
+    }
+
+
+    // Remote Procedure Calls (RPC) callable by the server, to update the variables in all known clients
+    [ClientRpc]
+    void RpcUp(int upValue, int downValue, int rightValue, int leftValue) {
+        alphaValueUpClient = upValue;
+        alphaValueDownClient = downValue;
+        alphaValueLeftClient = leftValue;
+        alphaValueRightClient = rightValue;
+    }
 }

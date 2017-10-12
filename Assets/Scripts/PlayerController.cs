@@ -2,225 +2,174 @@
 using System.Collections;
 using UnityEngine.Networking;
 
+
 public class PlayerController : NetworkBehaviour {
 
-
-
-    
-
-
-    Vector3 initPos;
-
+    // Linking the script containing the network wide variables
     public NetworkVariable networkVariable;
 
-    public GameObject RedUp;
-    Color RedUpColor;
+    // Setting up variables for the 4 directionnal red arrow sprites
+    public GameObject redArrowUp;
+    Color redArrowUpColor;
 
-    public GameObject RedDown;
-    Color RedDownColor;
+    public GameObject redArrowDown;
+    Color redArrowDownColor;
 
-    public GameObject RedLeft;
-    Color RedLeftColor;
+    public GameObject redArrowLeft;
+    Color redArrowLeftColor;
 
-    public GameObject RedRight;
-    Color RedRightColor;
-
-
-
-    private NetworkIdentity objNetId;
+    public GameObject redArrowRight;
+    Color redArrowRightColor;
 
 
-    // Use this for initialization
+
     void Start() {
-        RedUpColor= RedUp.GetComponent<SpriteRenderer>().color;
-        RedDownColor = RedDown.GetComponent<SpriteRenderer>().color;
-        RedLeftColor = RedLeft.GetComponent<SpriteRenderer>().color;
-        RedRightColor = RedRight.GetComponent<SpriteRenderer>().color;
-        //networkVariable = GameObject.FindGameObjectWithTag("NetworkVariable").GetComponent<NetworkVariable>();
-        if (!isLocalPlayer) {
-            return;
-        }
-
+        redArrowUpColor = redArrowUp.GetComponent<SpriteRenderer>().color;
+        redArrowDownColor = redArrowDown.GetComponent<SpriteRenderer>().color;
+        redArrowLeftColor = redArrowLeft.GetComponent<SpriteRenderer>().color;
+        redArrowRightColor = redArrowRight.GetComponent<SpriteRenderer>().color;
     }
 
-    // Update is called once per frame
+
     void Update() {
+        // Handling the objects (other than the player avatar) moved by the other instances
         if (!isLocalPlayer) {
-            
+            // If the instance has the server role, updating the client avatar variables
             if (isServer) {
-                RedUpColor.a = networkVariable.colorUpRedA2;
+                redArrowUpColor.a = networkVariable.alphaValueUpClient;
+                redArrowDownColor.a = networkVariable.alphaValueDownClient;
+                redArrowLeftColor.a = networkVariable.alphaValueLeftClient;
+                redArrowRightColor.a = networkVariable.alphaValueRightClient;
             } else {
-                RedUpColor.a = networkVariable.colorUpRedA1;
+                redArrowUpColor.a = networkVariable.alphaValueUpServer;
+                redArrowDownColor.a = networkVariable.alphaValueDownServer;
+                redArrowLeftColor.a = networkVariable.alphaValueLeftServer;
+                redArrowRightColor.a = networkVariable.alphaValueRightServer;
             }
-            RedUp.GetComponent<SpriteRenderer>().color = RedUpColor;
 
-            if (isServer) {
-                RedDownColor.a = networkVariable.colorDownRedA2;
-            } else {
-                RedDownColor.a = networkVariable.colorDownRedA1;
-            }
-            RedDown.GetComponent<SpriteRenderer>().color = RedDownColor;
-
-            if (isServer) {
-                RedLeftColor.a = networkVariable.colorLeftRedA2;
-            } else {
-                RedLeftColor.a = networkVariable.colorLeftRedA1;
-            }
-            RedLeft.GetComponent<SpriteRenderer>().color = RedLeftColor;
-
-            if (isServer) {
-                RedRightColor.a = networkVariable.colorRightRedA2;
-            } else {
-                RedRightColor.a = networkVariable.colorRightRedA1;
-            }
-            RedRight.GetComponent<SpriteRenderer>().color = RedRightColor;
-
-
+            // Using the changed variables to update the sprite renderer
+            redArrowUp.GetComponent<SpriteRenderer>().color = redArrowUpColor;
+            redArrowDown.GetComponent<SpriteRenderer>().color = redArrowDownColor;
+            redArrowLeft.GetComponent<SpriteRenderer>().color = redArrowLeftColor;
+            redArrowRight.GetComponent<SpriteRenderer>().color = redArrowRightColor;
 
             return;
         }
 
-
+        // Handling avatar movement
+        // If the instance has the server role
         if (isServer) {
+            // Handling movement and color (using alpha) in case of input in this direction
             if (Input.GetButton("Up")) {
                 transform.Translate(0, Time.deltaTime, 0);
                 
-                networkVariable.colorUpRedA1 = 1;
-                RedUpColor.a = networkVariable.colorUpRedA1;
+                networkVariable.alphaValueUpServer = 1;
+                redArrowUpColor.a = networkVariable.alphaValueUpServer;
+
+                redArrowUp.GetComponent<SpriteRenderer>().color = redArrowUpColor;
                 
-
-                RedUp.GetComponent<SpriteRenderer>().color = RedUpColor;
-
+            // Handling the color reset when no input detected in this direction
             } else {
+                networkVariable.alphaValueUpServer = 0;
+                redArrowUpColor.a = networkVariable.alphaValueUpServer;
                 
-                networkVariable.colorUpRedA1 = 0;
-                RedUpColor.a = networkVariable.colorUpRedA1;
-                
-                RedUp.GetComponent<SpriteRenderer>().color = RedUpColor;
+                redArrowUp.GetComponent<SpriteRenderer>().color = redArrowUpColor;
             }
 
             if (Input.GetButton("Down")) {
                 transform.Translate(0, -Time.deltaTime, 0);
                 
-                networkVariable.colorDownRedA1 = 1;
-                RedDownColor.a = networkVariable.colorDownRedA1;
+                networkVariable.alphaValueDownServer = 1;
+                redArrowDownColor.a = networkVariable.alphaValueDownServer;
                 
-                RedDown.GetComponent<SpriteRenderer>().color = RedDownColor;
+                redArrowDown.GetComponent<SpriteRenderer>().color = redArrowDownColor;
+                
             } else {
+                networkVariable.alphaValueDownServer = 0;
+                redArrowDownColor.a = networkVariable.alphaValueDownServer;
                 
-                networkVariable.colorDownRedA1 = 0;
-                RedDownColor.a = networkVariable.colorDownRedA1;
-                
-                RedDown.GetComponent<SpriteRenderer>().color = RedDownColor;
+                redArrowDown.GetComponent<SpriteRenderer>().color = redArrowDownColor;
             }
 
             if (Input.GetButton("Left")) {
                 transform.Translate(-Time.deltaTime, 0, 0);
                 
-                networkVariable.colorLeftRedA1 = 1;
-                RedLeftColor.a = networkVariable.colorLeftRedA1;
+                networkVariable.alphaValueLeftServer = 1;
+                redArrowLeftColor.a = networkVariable.alphaValueLeftServer;
                 
-                RedLeft.GetComponent<SpriteRenderer>().color = RedLeftColor;
-            } else {
-                
-                networkVariable.colorLeftRedA1 = 0;
-                RedLeftColor.a = networkVariable.colorLeftRedA1;
-                
-                RedLeft.GetComponent<SpriteRenderer>().color = RedLeftColor;
+                redArrowLeft.GetComponent<SpriteRenderer>().color = redArrowLeftColor;
 
+            } else {
+                networkVariable.alphaValueLeftServer = 0;
+                redArrowLeftColor.a = networkVariable.alphaValueLeftServer;
+                
+                redArrowLeft.GetComponent<SpriteRenderer>().color = redArrowLeftColor;
             }
 
             if (Input.GetButton("Right")) {
                 transform.Translate(Time.deltaTime, 0, 0);
                 
-                networkVariable.colorRightRedA1 = 1;
-                RedRightColor.a = networkVariable.colorRightRedA1;
+                networkVariable.alphaValueRightServer = 1;
+                redArrowRightColor.a = networkVariable.alphaValueRightServer;
                 
-                RedRight.GetComponent<SpriteRenderer>().color = RedRightColor;
+                redArrowRight.GetComponent<SpriteRenderer>().color = redArrowRightColor;
             } else {
+                networkVariable.alphaValueRightServer = 0;
+                redArrowRightColor.a = networkVariable.alphaValueRightServer;
                 
-                networkVariable.colorRightRedA1 = 0;
-                RedRightColor.a = networkVariable.colorRightRedA1;
-                
-                RedRight.GetComponent<SpriteRenderer>().color = RedRightColor;
+                redArrowRight.GetComponent<SpriteRenderer>().color = redArrowRightColor;
             }
 
-
+        // If the instance has the client role
         } else {
-            int up;
-            int down;
-            int right;
-            int left;
+            // Defining locally alpha values to export coloration on the network
+            int upValue, downValue, rightValue, leftValue;
+
+            // Handling movement and color (using alpha) in case of input in this direction
             if (Input.GetButton("Up")) {
                 transform.Translate(0, Time.deltaTime, 0);
-                
-
-                up=1;
-                
-
+                upValue = 1;
+            // Handling the color reset when no input detected in this direction
             } else {
-
-                up = 0;
-               
+                upValue = 0;               
             }
 
             if (Input.GetButton("Down")) {
                 transform.Translate(0, -Time.deltaTime, 0);
-
-                down = 1;
-                
+                downValue = 1;
             } else {
-
-                down = 0;
-                
+                downValue = 0;
             }
 
             if (Input.GetButton("Left")) {
                 transform.Translate(-Time.deltaTime, 0, 0);
-
-                left = 1;
-                
+                leftValue = 1;
             } else {
-
-                left = 0;
-                
-
+                leftValue = 0;
             }
 
             if (Input.GetButton("Right")) {
                 transform.Translate(Time.deltaTime, 0, 0);
-                right = 1;
-                
+                rightValue = 1;
             } else {
-
-                right = 0;
-                
+                rightValue = 0;
             }
 
-            networkVariable.CmdClient(up, down, right, left);
+            // Calling the client callable method, to warn the server about the updated variables
+            networkVariable.CmdClient(upValue, downValue, rightValue, leftValue);
 
-            RedUpColor.a = networkVariable.colorUpRedA2;
-            RedUp.GetComponent<SpriteRenderer>().color = RedUpColor;
+            // Updating the rendering using the changed variables
+            redArrowUpColor.a = networkVariable.alphaValueUpClient;
+            redArrowUp.GetComponent<SpriteRenderer>().color = redArrowUpColor;
 
-            RedDownColor.a = networkVariable.colorDownRedA2;
-            RedDown.GetComponent<SpriteRenderer>().color = RedDownColor;
+            redArrowDownColor.a = networkVariable.alphaValueDownClient;
+            redArrowDown.GetComponent<SpriteRenderer>().color = redArrowDownColor;
 
-            RedLeftColor.a = networkVariable.colorLeftRedA2;
-            RedLeft.GetComponent<SpriteRenderer>().color = RedLeftColor;
+            redArrowLeftColor.a = networkVariable.alphaValueLeftClient;
+            redArrowLeft.GetComponent<SpriteRenderer>().color = redArrowLeftColor;
 
-            RedRightColor.a = networkVariable.colorRightRedA2;
-            RedRight.GetComponent<SpriteRenderer>().color = RedRightColor;
+            redArrowRightColor.a = networkVariable.alphaValueRightClient;
+            redArrowRight.GetComponent<SpriteRenderer>().color = redArrowRightColor;
         }
-
-
-        
-
-        
-
-       
-
     }
-
-    
-
 }
