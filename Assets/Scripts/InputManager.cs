@@ -4,6 +4,7 @@ using System.Collections;
 public class InputManager : MonoBehaviour {
 
     public Transform cameraTransform;
+    public Rigidbody cameraRigidbody;
 
     public float sensitivityX;
     public float sensitivityY;
@@ -28,9 +29,40 @@ public class InputManager : MonoBehaviour {
         rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
         rotationY = Mathf.Clamp(rotationY, minimumY, maximumY);
 
-        cameraTransform.localEulerAngles = new Vector3(-rotationY, rotationX, 0);
 
-        cameraTransform.Translate(Input.GetAxis("Horizontal")*Time.deltaTime*speed, 0, Input.GetAxis("Vertical")*Time.deltaTime*speed);
+        float yMove = 0;
+        if (Input.GetButton("Up")) {
+            
+            yMove += 1;
+        }
+        if (Input.GetButton("Down")) {
+            
+            yMove -= 1;
+        }
+
+        rotateCamera(new Vector3(-rotationY, rotationX, 0));
+        
+        moveCamera(new Vector3(Input.GetAxis("Horizontal") * speed* Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * speed * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180), 1* yMove*speed, 
+            -Input.GetAxis("Horizontal") * speed* Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * speed * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180)));
+        
+
+
 
     }
+    
+
+    
+
+    void rotateCamera(Vector3 rotation) {
+        cameraRigidbody.angularVelocity = new Vector3(0,0,0);
+        cameraTransform.localEulerAngles = rotation;
+    }
+
+
+    void moveCamera(Vector3 move) {
+        cameraRigidbody.velocity = move;
+        //cameraTransform.Translate(move);
+    }
+
+
 }
