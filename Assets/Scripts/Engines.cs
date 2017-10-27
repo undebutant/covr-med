@@ -2,28 +2,23 @@
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Engines : MonoBehaviour
-{
+public class Engines : MonoBehaviour {
+
     private Vector3 speed;
 
-    public Vector3 Speed
-    {
-        get
-        {
+    [SerializeField]
+    public float MaxSpeed;
+
+    public Vector3 Speed {
+        get {
             return this.speed;
         }
-        set
-        {
+        set {
             this.speed = value;
         }
     }
 
-
-    void Update()
-    {
-
-        transform.Translate(speed * this.GetComponent<ObjectAvatar>().MaxSpeed * Time.deltaTime);
-
-
+    void Update() {
+        transform.Translate(speed * MaxSpeed * Time.deltaTime);
     }
 }

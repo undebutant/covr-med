@@ -1,34 +1,29 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-public class MouseDrag : MonoBehaviour
-{
+/// <summary>
+///     To be applied on the object that is dragged
+/// </summary>
 
-    /*  float distance = 10;
-
-      void OnMouseDrag()
-      {
-          Vector3 mousePosition = new Vector3(Input.mousePosition.x, Input.mousePosition.y, distance);
-          Vector3 objectPosition = Camera.main.ScreenToWorldPoint(mousePosition);
-
-          transform.position = objectPosition;
-      }*/
+public class MouseDrag : MonoBehaviour {
 
     Vector3 offset;
     Vector3 screenPoint;
-    void OnMouseDown()
-    {
 
+    /// <summary>
+    ///     Moves the object depending on the camera
+    /// </summary>
+    void OnMouseDown() {
         screenPoint = Camera.main.WorldToScreenPoint(transform.position);
-
         offset = transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
     }
 
-    void OnMouseDrag()
-    {
+    /// <summary>
+    ///     Drags the object with the mouse
+    /// </summary>
+    void OnMouseDrag() {
         Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
         Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
         transform.position = curPosition;
     }
-
 }
