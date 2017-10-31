@@ -2,66 +2,58 @@
 using System.Collections;
 
 public class InputManager : MonoBehaviour {
-    //Position et Rigidbody de la caméra
+
+    // Transform and Rigibody of the main camera
     public Transform cameraTransform;
     public Rigidbody cameraRigidbody;
 
-    //Variables de sensibilité
-    public float sensitivityX;
-    public float sensitivityY;
-    //Variable d'angle max
+    // Sensitivity variables
+    public float sensitivityXAxis;
+    public float sensitivityYAxis;
+
+    // Clamping the allowed angle for the camera
     public float minimumX = -360F;
     public float maximumX = 360F;
     public float minimumY = -60F;
     public float maximumY = 60F;
-    //Vitesse du déplacement
+
+    // Moving speed
     public float speed;
 
+    // Current Y rotation of the camera
     float rotationY = 0F;
-    // Use this for initialization
-    void Start () {
-	
-	}
-	
-	// Update is called once per frame
-	void Update () {
-        
-        //Calcul des angles de déplacement en fonction de la position de la souris
-        float rotationX = cameraTransform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityX;
 
-        rotationY += Input.GetAxis("Mouse Y") * sensitivityY;
+
+	void Update () {
+        // Calculating camera rotations given the mouse movements
+        float rotationX = cameraTransform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityXAxis;
+
+        rotationY += Input.GetAxis("Mouse Y") * sensitivityYAxis;
         rotationY = Mathf.Clamp(rotationY, minimumY, maximumY);
 
-        //Calcule des déplacements en hauteur
+        // Calculating up and down movements
         float yMove = 0;
         if (Input.GetButton("Up")) {
-            
             yMove += 1;
         }
         if (Input.GetButton("Down")) {
-            
             yMove -= 1;
         }
 
-        //Calcule des déplacements dans le plan
-        float xMove = Input.GetAxis("Horizontal")  * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical")  * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180);
+        // Calculating movements in the current plan
+        float xMove = Input.GetAxis("Horizontal")  * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180);
         float zMove = -Input.GetAxis("Horizontal") * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180);
 
-        //Rotation
+        // Applying rotations
         rotateCamera(new Vector3(-rotationY, rotationX, 0));
-        //Déplacement
-        moveCamera(new Vector3(xMove, yMove, zMove)*speed);
-        
 
-
-
+        // Applying movements
+        moveCamera(new Vector3(xMove, yMove, zMove) * speed);
     }
-    
 
-    
 
     void rotateCamera(Vector3 rotation) {
-        //Anulation de la vélocité sur la rotation
+        // Cancelling angular velocity on the rotation
         cameraRigidbody.angularVelocity = new Vector3(0,0,0);
 
         cameraTransform.localEulerAngles = rotation;
@@ -70,8 +62,5 @@ public class InputManager : MonoBehaviour {
 
     void moveCamera(Vector3 move) {
         cameraRigidbody.velocity = move;
-        
     }
-
-
 }
