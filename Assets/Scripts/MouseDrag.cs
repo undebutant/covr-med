@@ -1,14 +1,18 @@
 ﻿using UnityEngine;
 using System.Collections;
 
-/// <summary>
-///     To be applied on the object that is dragged
-/// </summary>
 
+/// <summary>
+///     Script to add in order to have a draggable object
+/// </summary>
 public class MouseDrag : MonoBehaviour {
 
-    Vector3 offset;
+    // The position of the cursor
     Vector3 screenPoint;
+
+    // Taking in account the relative distance between the point clicked by the cursor, and the center of the object
+    Vector3 offset;
+
 
     /// <summary>
     ///     Moves the object depending on the camera
@@ -19,7 +23,7 @@ public class MouseDrag : MonoBehaviour {
     }
 
     /// <summary>
-    ///     Drags the object with the mouse
+    ///     Allows the objects to be dragged using the mouse, teleporting it to the last known position of the cursor
     /// </summary>
     void OnMouseDrag() {
         Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);

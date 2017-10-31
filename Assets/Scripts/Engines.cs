@@ -2,23 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+
+/// <summary>
+///     Basic movement for a given object, given its maximum speed, and the input
+/// </summary>
 public class Engines : MonoBehaviour {
 
-    private Vector3 speed;
+    Vector3 inputDirections;
 
-    [SerializeField]
-    public float MaxSpeed;
-
-    public Vector3 Speed {
+    public Vector3 InputDirection {
         get {
-            return this.speed;
+            return this.inputDirections;
         }
         set {
-            this.speed = value;
+            this.inputDirections = value;
         }
     }
 
+
+    public float maxSpeed;
+
+
     void Update() {
-        transform.Translate(speed * MaxSpeed * Time.deltaTime);
+        transform.Translate(inputDirections * maxSpeed * Time.deltaTime);
     }
 }
