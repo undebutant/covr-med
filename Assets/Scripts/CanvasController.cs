@@ -12,7 +12,7 @@ public class CanvasController : MonoBehaviour {
     // Use this for initialization
     void Start () {
         instructionsDoc = new XmlDocument();
-        instructionsDoc.Load("Assets/Scripts/french.xml");
+        instructionsDoc.Load("Assets/Language_Files/french.xml");
         root = instructionsDoc.FirstChild;
 
         // This is how to access the different instructions
