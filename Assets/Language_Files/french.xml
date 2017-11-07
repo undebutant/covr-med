@@ -1,0 +1,13 @@
+<instructions>
+	<instruction id="0">Bonjour, bienvenue dans le bloc opératoire de CoVR-Med. Ce tutoriel va vous guider à travers les commandes de bases du simulateur.</instruction>
+	<instruction id="1">Comme dans un bloc opératoire traditionnel, l’environnement dans lequel vous vous trouvez se compose de plusieurs appareils électroniques, de meubles, d’instruments chirurgicaux… </instruction>
+	<instruction id="2">Voyez-vous la mallette posée sur la table près du téléphone à votre droite ? Elle contient l’ensemble des instruments dont le chirurgien a besoin afin de mener à bien sa biopsie du foie.</instruction>
+	<instruction id="3">L’objectif de ce tutoriel est d’aller la chercher, et d’en verser le contenu sur la table d’opération.</instruction>
+	<instruction id="4">Dirigez-vous tout d’abord vers la table afin de pouvoir prendre la mallette.</instruction>
+	<instruction id="5">Très bien, maintenant appuyez sur le bouton de changement de mode, afin de passer en mode “sélection et manipulation d’objets”.</instruction>
+	<instruction id="6">Excellent ! Sélectionnez la mallette grâce au bouton de sélection</instruction>
+	<instruction id="7">Super ! La mallette est maintenant dans votre main, repassez en mode “déplacement” grâce au bouton de changement de mode</instruction>
+	<instruction id="8">Voyez-vous la table d’opération stérile proche du patient ? C’est à cet endroit que vous allez déposer la mallette. Déplacez vous vers cette table de la manière que précédemment.</instruction>
+	<instruction id="9">Repassez en mode “sélection et manipulation d’objet” afin de déposer la mallette sur la table. Le bouton que vous aviez utilisé pour la sélection permet aussi de relâcher un objet.</instruction>
+	<instruction id="10">Bravo ! Vous avez accompli ce tutoriel avec brio !</instruction>
+</instructions>
