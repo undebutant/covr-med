@@ -2,6 +2,9 @@
 using System.Collections;
 
 public class InputManager : MonoBehaviour {
+    //ModeManager
+    public ModeManager modeManager;
+
 
     // Transform and Rigibody of the main camera
     public Transform cameraTransform;
@@ -25,30 +28,36 @@ public class InputManager : MonoBehaviour {
 
 
 	void Update () {
-        // Calculating camera rotations given the mouse movements
-        float rotationX = cameraTransform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityXAxis;
 
-        rotationY += Input.GetAxis("Mouse Y") * sensitivityYAxis;
-        rotationY = Mathf.Clamp(rotationY, minimumY, maximumY);
+        if(modeManager.isCameraModeOn()) {
+            // Calculating camera rotations given the mouse movements
+            float rotationX = cameraTransform.localEulerAngles.y + Input.GetAxis("Mouse X") * sensitivityXAxis;
 
-        // Calculating up and down movements
-        float yMove = 0;
-        if (Input.GetButton("Up")) {
-            yMove += 1;
+            rotationY += Input.GetAxis("Mouse Y") * sensitivityYAxis;
+            rotationY = Mathf.Clamp(rotationY, minimumY, maximumY);
+
+            // Calculating up and down movements
+            float yMove = 0;
+            if (Input.GetButton("Up")) {
+                yMove += 1;
+            }
+            if (Input.GetButton("Down")) {
+                yMove -= 1;
+            }
+
+            // Calculating movements in the current plan
+            float xMove = Input.GetAxis("Horizontal") * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180);
+            float zMove = -Input.GetAxis("Horizontal") * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180);
+
+            // Applying rotations
+            rotateCamera(new Vector3(-rotationY, rotationX, 0));
+
+            // Applying movements
+            moveCamera(new Vector3(xMove, yMove, zMove) * speed);
+        } else {
+            moveCamera(new Vector3(0, 0, 0));
         }
-        if (Input.GetButton("Down")) {
-            yMove -= 1;
-        }
-
-        // Calculating movements in the current plan
-        float xMove = Input.GetAxis("Horizontal")  * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180);
-        float zMove = -Input.GetAxis("Horizontal") * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180);
-
-        // Applying rotations
-        rotateCamera(new Vector3(-rotationY, rotationX, 0));
-
-        // Applying movements
-        moveCamera(new Vector3(xMove, yMove, zMove) * speed);
+        
     }
 
 
