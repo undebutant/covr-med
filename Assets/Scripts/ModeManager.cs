@@ -25,6 +25,11 @@ public class ModeManager : MonoBehaviour {
 	void Update () {
         if(Input.GetButtonDown("Switch")) {
             modeCameraOn = !modeCameraOn;
+            if(modeCameraOn) {
+                Cursor.lockState = CursorLockMode.Locked;
+            } else {
+                Cursor.lockState = CursorLockMode.None;
+            }
         }
 
     }

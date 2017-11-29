@@ -6,6 +6,8 @@ using System.Collections;
 ///     Script to add in order to have a draggable object
 /// </summary>
 public class MouseDrag : MonoBehaviour {
+    //ModeManager
+    public ModeManager modeManager;
 
     // The position of the cursor
     Vector3 screenPoint;
@@ -26,8 +28,10 @@ public class MouseDrag : MonoBehaviour {
     ///     Allows the objects to be dragged using the mouse, teleporting it to the last known position of the cursor
     /// </summary>
     void OnMouseDrag() {
+        
         Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
         Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
         transform.position = curPosition;
+        
     }
 }
