@@ -15,6 +15,10 @@ public class NetworkAvatarSetup : NetworkBehaviour {
     GameObject playerCamera;
 
     [SerializeField]
+    [Tooltip("The avatar rendering of the player avatar prefab, to set active on creation of the avatar")]
+    GameObject playerAvatar;
+
+    [SerializeField]
     [Tooltip("The collider of the player avatar prefab, to set active on creation of the avatar")]
     Collider playerCollider;
 
@@ -33,6 +37,9 @@ public class NetworkAvatarSetup : NetworkBehaviour {
 
             // Enabling the player's input manager
             playerInputManager.enabled = true;
+
+            // Disabling the player's avatar
+            playerAvatar.SetActive(false);
 
 
             // Disabling the global camera of the scene
