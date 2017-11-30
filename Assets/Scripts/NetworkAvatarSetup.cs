@@ -14,11 +14,19 @@ public class NetworkAvatarSetup : NetworkBehaviour {
     [Tooltip("The camera of the player avatar prefab, to set active on creation of the avatar")]
     GameObject playerCamera;
 
+    [SerializeField]
+    [Tooltip("The collider of the player avatar prefab, to set active on creation of the avatar")]
+    Collider playerCollider;
+
 
     void Start() {
         if(isLocalPlayer) {
             // Enabling the avatar's camera
             playerCamera.SetActive(true);
+
+            // Enabling the player's collider
+            playerCollider.enabled = true;
+
 
             // Disabling the global camera of the scene
             GameObject.FindWithTag("SceneCamera").SetActive(false);
