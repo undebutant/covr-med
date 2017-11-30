@@ -18,6 +18,10 @@ public class NetworkAvatarSetup : NetworkBehaviour {
     [Tooltip("The collider of the player avatar prefab, to set active on creation of the avatar")]
     Collider playerCollider;
 
+    [SerializeField]
+    [Tooltip("The input manager of the player avatar prefab, to set active on creation of the avatar")]
+    InputManager playerInputManager;
+
 
     void Start() {
         if(isLocalPlayer) {
@@ -26,6 +30,9 @@ public class NetworkAvatarSetup : NetworkBehaviour {
 
             // Enabling the player's collider
             playerCollider.enabled = true;
+
+            // Enabling the player's input manager
+            playerInputManager.enabled = true;
 
 
             // Disabling the global camera of the scene

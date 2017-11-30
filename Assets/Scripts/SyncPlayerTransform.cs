@@ -37,6 +37,9 @@ public class SyncPlayerTransform : NetworkBehaviour {
             LerpPosition();
             SlerpRotation();
         }
+        else {
+            TransmitPositionToServer();
+        }
     }
 
 
