@@ -1,33 +1,132 @@
 ﻿using UnityEngine;
 using System.Collections;
 
+public class MouseDrag : MonoBehaviour
+{
+    public string placeName = "place";
+    public string zoneName = "zone";
+    public float scale = 1;
+    public float closeDistance = 0.05f;
+    public float moveSpeed = 40.0f;
+    public float rotateSpeed = 90.0f;
 
-/// <summary>
-///     Script to add in order to have a draggable object
-/// </summary>
-public class MouseDrag : MonoBehaviour {
+    private float distance;
 
-    // The position of the cursor
+    private Color normalColor = new Color();
+    private GameObject place;
+    private GameObject zone;
+    private GameObject hand;
+
+    Color closeColor = new Color(0,1,0);
+
+    Vector3 offset;
     Vector3 screenPoint;
 
-    // Taking in account the relative distance between the point clicked by the cursor, and the center of the object
-    Vector3 offset;
+    private Shader shaderNormal;
+    private Shader shaderHighlighted;
+
+    Collider objectCollider;
+    Vector3 objectSize, objectMin, objectMax;
+    Collider handCollider;
+    Vector3 handSize, handMin, handMax;
 
 
-    /// <summary>
-    ///     Moves the object depending on the camera
-    /// </summary>
-    void OnMouseDown() {
+    float zPosition;
+    Vector3 cursorPosition;
+
+    bool selected;
+
+    private void Start()
+    {
+        selected = false;
+        zone = GameObject.Find(zoneName);
+        normalColor = zone.GetComponent<Renderer>().material.color;
+        place = GameObject.Find(placeName);
+        zone.transform.localScale += new Vector3(scale, 0, scale);
+        hand = GameObject.Find("hand");
+        shaderNormal = Shader.Find("VertexLit");
+        shaderHighlighted = Shader.Find("Diffuse");
+
+ 
+        objectCollider = GetComponent<Collider>();
+     
+
+        objectMin = objectCollider.bounds.min;
+        objectMax = objectCollider.bounds.max;
+        
+
+        zPosition = transform.position.z;
+
+    }
+
+   /* private void Update()
+    {
+        if ((objectMin.x <= hand.transform.position.x && objectMax.x >= hand.transform.position.x)
+            && (objectMin.y <= hand.transform.position.y && objectMax.y >= hand.transform.position.y))
+        {
+            GetComponent<Renderer>().material.shader = shaderHighlighted;//selection effect
+            if (Input.GetMouseButtonDown(0))
+            {
+                selected = true;
+            }
+        }
+
+        else
+            GetComponent<Renderer>().material.shader = shaderNormal;//selection effect
+
+        if (selected)
+        {
+            GetComponent<Renderer>().material.shader = shaderHighlighted;//selection effect
+            transform.position = new Vector3(hand.transform.position.x, hand.transform.position.y, transform.position.z) ;
+            Vector3 zonePosition = place.transform.position;
+
+            distance = Vector3.Distance(zonePosition, transform.position);
+            zone.GetComponent<Renderer>().material.color = (distance < closeDistance) ? closeColor : normalColor;
+        }
+
+        if(selected && Input.GetMouseButtonDown(0))
+        {
+            if (distance < closeDistance)
+            {
+                transform.localPosition = Vector3.MoveTowards(place.transform.localPosition, Vector3.zero, Time.deltaTime * moveSpeed);
+                transform.localRotation = Quaternion.RotateTowards(place.transform.localRotation, Quaternion.identity, Time.deltaTime * rotateSpeed);
+                zone.GetComponent<Renderer>().material.color = normalColor;
+                selected = false;
+            }
+        }
+    }
+
+        */
+    void OnMouseDown()
+    {
         screenPoint = Camera.main.WorldToScreenPoint(transform.position);
         offset = transform.position - Camera.main.ScreenToWorldPoint(new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z));
     }
 
-    /// <summary>
-    ///     Allows the objects to be dragged using the mouse, teleporting it to the last known position of the cursor
-    /// </summary>
-    void OnMouseDrag() {
+
+
+    void OnMouseDrag()
+    {
         Vector3 curScreenPoint = new Vector3(Input.mousePosition.x, Input.mousePosition.y, screenPoint.z);
         Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
+        Vector3 zonePosition = place.transform.position;
+
         transform.position = curPosition;
+     
+        distance = Vector3.Distance(zonePosition, transform.position);
+        zone.GetComponent<Renderer>().material.color = (distance < closeDistance) ? closeColor : normalColor;
     }
+
+
+
+    void OnMouseUp()
+    {
+        if (distance < closeDistance)
+        {
+            transform.localPosition = Vector3.MoveTowards(place.transform.localPosition, Vector3.zero, Time.deltaTime * moveSpeed);
+            transform.localRotation = Quaternion.RotateTowards(place.transform.localRotation, Quaternion.identity, Time.deltaTime * rotateSpeed);
+            zone.GetComponent<Renderer>().material.color = normalColor;
+        }
+    }
+
 }

@@ -2,28 +2,28 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+public class Engines : MonoBehaviour
+{
+    private Vector3 speed;
 
-/// <summary>
-///     Basic movement for a given object, given its maximum speed, and the input
-/// </summary>
-public class Engines : MonoBehaviour {
-
-    Vector3 inputDirections;
-
-    public Vector3 InputDirection {
-        get {
-            return this.inputDirections;
+    public Vector3 Speed
+    {
+        get
+        {
+            return this.speed;
         }
-        set {
-            this.inputDirections = value;
+        set
+        {
+            this.speed = value;
         }
     }
 
 
-    public float maxSpeed;
+    void Update()
+    {
+
+        transform.Translate(speed * this.GetComponent<ObjectAvatar>().MaxSpeed * Time.deltaTime);
 
 
-    void Update() {
-        transform.Translate(inputDirections * maxSpeed * Time.deltaTime);
     }
 }
