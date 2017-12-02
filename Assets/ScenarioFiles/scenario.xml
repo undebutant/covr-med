@@ -38,7 +38,7 @@
 			</Substep>
 		</Step>
 		<Step name="Commencer l'opération" number="1">
-			<Substep instruction="Prenez la seringue">
+			<Substep instruction="Prenez la seringue" number="0">
 				<Instruction>Prenez la seringue</Instruction>
 				<EndsWhen condition="ObjectSelected" userId="1" objectId="0" stateSelectableObject="selected"/>
 			</Substep>

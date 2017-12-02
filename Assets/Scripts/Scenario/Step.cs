@@ -5,7 +5,7 @@ using UnityEngine;
 public class Step {
     int number;
     string stepName;
-    List<SubStep> subSteps = new List<SubStep>();
+    List<SubStep> subSteps;
     SubStep currentSubStep;
 
     public int Number {
@@ -22,7 +22,7 @@ public class Step {
             return this.stepName;
         }
         set {
-            this.StepName = value;
+            this.stepName = value;
         }
     }
 
@@ -35,11 +35,13 @@ public class Step {
     public Step(int numberParam, string stepNameParam) {
         Number = numberParam;
         StepName = stepNameParam;
-        currentSubStep = subSteps[0];
+        subSteps = new List<SubStep>();
+        currentSubStep = null;
     }
 
     public void AddSubStep(SubStep sub) {
         subSteps.Add(sub);
+        currentSubStep = currentSubStep == null ? subSteps[0] : currentSubStep;
     }
 
     public void MoveToNextSubStep() {

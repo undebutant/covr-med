@@ -55,6 +55,9 @@ public class Scenario : MonoBehaviour {
         nodesList = instructionsDoc.SelectNodes("ScenarioManager");
         root = nodesList[0];
 
+        //  steps initialisation
+        steps = new List<Step>();
+
         foreach (XmlNode xnode in root.ChildNodes)
         {
             //  Selectable Objects
@@ -94,15 +97,16 @@ public class Scenario : MonoBehaviour {
                             Int32.Parse(subStepXml.Attributes["number"].Value), 
                             subStepXml["Instruction"].InnerText, 
                             Int32.Parse(subStepXml["EndsWhen"].Attributes["userId"].Value), 
-                            (Condition) Enum.Parse(typeof(Condition), subStepXml["EndsWhen"].Attributes["userId"].Value)
+                            (Condition) Enum.Parse(typeof(Condition), subStepXml["EndsWhen"].Attributes["condition"].Value)
                             );
 
                         if(subStep.AccomplishmentCondition == Condition.UserNextToSelectableObject) {
-                            subStep.AddOtherObjectId(Int32.Parse(subStepXml["EndWhen"].Attributes["objectId"].Value));
+                            subStep.AddOtherObjectId(Int32.Parse(subStepXml["EndsWhen"].Attributes["objectId"].Value));
                         }
 
                         step.AddSubStep(subStep);
                     }
+                    steps.Add(step);
                 }
             }
         }

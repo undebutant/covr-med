@@ -46,5 +46,6 @@ public class SubStep {
         instruction = instructionParam;
         userId = userIdParam;
         accomplishmentCondition = accomplishmentConditionParam;
+        otherObjectId = 0;
     }
 }
