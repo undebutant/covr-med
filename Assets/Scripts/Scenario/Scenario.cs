@@ -16,6 +16,8 @@ public class Scenario : MonoBehaviour {
     [Tooltip("The inserted object's id must correspond to the one written in the XML file")]
     public Selectable[] selectableObjects;
 
+    private Selectable[] selectedObject;
+
     [Tooltip("The inserted object's id must correspond to the one written in the XML file")]
     public Stationary[] stationaryObjects;
 
@@ -28,6 +30,9 @@ public class Scenario : MonoBehaviour {
     //  Distance needed between a user and an object for the step to be considered as done
     public float userObjectAccomplishingDistance = 10.0f;
 
+    //  Displayer
+    public GameObject displayer;
+
     XmlDocument instructionsDoc;
     XmlNodeList nodesList;
     XmlNode root;
@@ -39,8 +44,30 @@ public class Scenario : MonoBehaviour {
     /// <param name="obj2">GameObject 2</param>
     /// <param name="radius">Distance between both game objects</param>
     /// <returns></returns>
-    bool checkDistance(GameObject obj1, GameObject obj2, float radius) {
+    bool CheckDistance(GameObject obj1, GameObject obj2, float radius) {
         return Vector3.Distance(obj1.transform.position, obj2.transform.position) < radius ? true : false;
+    }
+
+    void SetSelectedObject(GameObject selectedObject) {
+        foreach(Selectable selectableObject in selectableObjects) {
+            if (selectableObject.associatedObject == selectedObject)
+                selectableObject.IsSelected = true;
+        }
+    }
+
+    void UnsetSelectedObject(GameObject releasedObject) {
+        foreach (Selectable selectableObject in selectableObjects) {
+            if (selectableObject.associatedObject == releasedObject)
+                selectableObject.IsSelected = false;
+        }
+    }
+
+    GameObject GetSelectedObject() {
+        foreach(Selectable selectableObject in selectableObjects) {
+            if (selectableObject.IsSelected)
+                return selectableObject.associatedObject;
+        }
+        return null;
     }
 
 
@@ -121,9 +148,19 @@ public class Scenario : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         Debug.Log(currentStep.CurrentSubStep.AccomplishmentCondition);
+        displayer.GetComponent<CanvasController>().SetText(currentStep.CurrentSubStep.Instruction);
         if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.UserNextToSelectableObject) {
             GameObject user = currentStep.CurrentSubStep.UserId == 0 ? GameObject.Find("Camera") : GameObject.Find("Camera"); //    Awful, TODO : manage the logic behind the users
-            Debug.Log(checkDistance(user, selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject, userObjectAccomplishingDistance));
+            Debug.Log(CheckDistance(user, selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject, userObjectAccomplishingDistance));
+            if(CheckDistance(user, selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject, userObjectAccomplishingDistance)) {
+                currentStep.MoveToNextSubStep();
+            }
         }
-	}
+        else if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.ObjectSelected) {
+            GameObject user = currentStep.CurrentSubStep.UserId == 0 ? GameObject.Find("Camera") : GameObject.Find("Camera"); //    Awful, TODO : manage the logic behind the users
+            if (GetSelectedObject() == selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject) {
+                currentStep.MoveToNextSubStep();
+            }
+        }
+    }
 }

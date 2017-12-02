@@ -37,6 +37,12 @@ public class SubStep {
         }
     }
 
+    public string Instruction {
+        get {
+            return this.instruction;
+        }
+    }
+
     public void AddOtherObjectId(int id) {
         this.otherObjectId = id;
     }
