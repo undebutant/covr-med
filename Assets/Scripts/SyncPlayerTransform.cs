@@ -58,7 +58,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
     [Command]
     private void CmdProvidePositionToServer(Vector3 positionReceived, Quaternion rotationReceived) {
         targetPosition = positionReceived;
-        targetRotation = rotationReceived;
+        targetRotation = new Quaternion(0, rotationReceived.y, 0, rotationReceived.w);  // Cancelling rotation on x and z axis to prevent weird moves of the avatar
     }
 
     /// <summary>
