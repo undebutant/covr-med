@@ -1,0 +1,47 @@
+<ScenarioManager>
+	<SelectableObjects>
+		<SelectableObject id="0">
+			<name>Malette</name>
+			<description>Contient le kit de chirurgie</description>
+		</SelectableObject>
+	</SelectableObjects>
+
+	<StationaryObjects>
+		<StationaryObject id="0">
+			<name>Table d'opération</name>
+			<description>Table sur laquelle sont posés les instruments chirurgicaux</description>
+		</StationaryObject>
+	</StationaryObjects>
+
+	<Scenes>
+		<Scene id="0" name="menu"/>
+		<Scene id="1" name="OR_Room"/>
+	</Scenes>
+
+	<Scenario id="0" name="tutorial" sceneId="1">
+		<Step name="Apporter la malette au chirurgien" number="0">
+			<Substep number="0">
+				<Instruction>Déplacez-vous vers la table sur laquelle est posée la malette</Instruction>
+				<EndsWhen condition="UserNextToSelectableObject" userId="0" objectId = "0"/>
+			</Substep>
+			<Substep number="1">
+				<Instruction>Prenez la malette</Instruction>
+				<EndsWhen condition="ObjectSelected" userId="0" objectId="0" stateSelectableObject="selected"/>
+			</Substep>
+			<Substep number="2">
+				<Instruction>Déplacez-vous vers la table d'opération</Instruction>
+				<EndsWhen condition="UserNextToStationaryObject" userId="0" userNextToStationaryObjectId = "0"/>
+			</Substep>
+			<Substep number="3">
+				<Instruction>Déposez la malette sur la table</Instruction>
+				<EndsWhen condition="ObjectReleased" userId="0" objectId="0" stateSelectableObject="released" objectOnStationaryObjectId = "0"/>
+			</Substep>
+		</Step>
+		<Step name="Commencer l'opération" number="1">
+			<Substep instruction="Prenez la seringue" number="0">
+				<Instruction>Prenez la seringue</Instruction>
+				<EndsWhen condition="ObjectSelected" userId="1" objectId="0" stateSelectableObject="selected"/>
+			</Substep>
+		</Step>
+	</Scenario>
+</ScenarioManager>
