@@ -1,7 +1,8 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
-public class InputManager : MonoBehaviour {
+public class InputManager : NetworkBehaviour {
 
     // Transform and Rigibody of the main camera
     public Transform playerTransform;
@@ -45,14 +46,16 @@ public class InputManager : MonoBehaviour {
         float zMove = -Input.GetAxis("Horizontal") * Mathf.Sin(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Cos(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180);
 
         // Applying rotations
-        rotateCamera(new Vector3(-rotationY, rotationX, 0));
+        rotatePlayer(new Vector3(-rotationY, rotationX, 0));
 
         // Applying movements
-        moveCamera(new Vector3(xMove, yMove, zMove) * speed);
+        if (!isServer) {
+            movePlayer(new Vector3(xMove, yMove, zMove) * speed);
+        }
     }
 
 
-    void rotateCamera(Vector3 rotation) {
+    void rotatePlayer(Vector3 rotation) {
         // Cancelling angular velocity on the rotation
         playerRigidbody.angularVelocity = new Vector3(0,0,0);
 
@@ -60,7 +63,7 @@ public class InputManager : MonoBehaviour {
     }
 
 
-    void moveCamera(Vector3 move) {
+    void movePlayer(Vector3 move) {
         playerRigidbody.velocity = move;
     }
 }
