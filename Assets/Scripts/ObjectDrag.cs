@@ -24,6 +24,7 @@ public class ObjectDrag : MonoBehaviour {
     Color closeColor = new Color(0, 1, 0);
     private Color normalColor = new Color();
 
+
     // Use this for initialization
     void Start () {
         layerSelectionable = LayerMask.NameToLayer("selectionable");
@@ -39,6 +40,7 @@ public class ObjectDrag : MonoBehaviour {
                 dragPossible = true;
                 objectScreenPoint = Camera.main.WorldToScreenPoint(shootHit.collider.gameObject.transform.position);
                 offset = shootHit.collider.gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z));
+                shootHit.collider.gameObject.transform.rotation = Quaternion.identity;
             }
         }
     }
