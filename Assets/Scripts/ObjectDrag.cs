@@ -7,6 +7,8 @@ public class ObjectDrag : MonoBehaviour {
     //TODO changer
     public Boolean controllerOn;
 
+    public Camera avatarCamera;
+
     //Variables du raycast
     [SerializeField]
     int range=1000;
@@ -18,8 +20,8 @@ public class ObjectDrag : MonoBehaviour {
     Vector3 offset;
     Vector3 objectScreenPoint;
 
-    //Varaibles de snap
-    public GameObject zone;
+    //Variables de snap
+    GameObject zone;
     public float closeDistance = 1.0f;
     Color closeColor = new Color(0, 1, 0);
     private Color normalColor = new Color();
@@ -27,6 +29,7 @@ public class ObjectDrag : MonoBehaviour {
 
     // Use this for initialization
     void Start () {
+        zone = GameObject.FindGameObjectWithTag("Zone");
         layerSelectionable = LayerMask.NameToLayer("selectionable");
         dragPossible = false;
         normalColor = zone.GetComponent<Renderer>().material.color;
@@ -34,12 +37,12 @@ public class ObjectDrag : MonoBehaviour {
 	
 
     void callRayCast(Vector3 handScreenPoint) {
-        Ray ray = Camera.main.ScreenPointToRay(Camera.main.WorldToScreenPoint(transform.position));
+        Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
         if (Physics.Raycast(ray, out shootHit, range)) {
             if (shootHit.collider.gameObject.layer == layerSelectionable) {
                 dragPossible = true;
-                objectScreenPoint = Camera.main.WorldToScreenPoint(shootHit.collider.gameObject.transform.position);
-                offset = shootHit.collider.gameObject.transform.position - Camera.main.ScreenToWorldPoint(new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z));
+                objectScreenPoint = avatarCamera.WorldToScreenPoint(shootHit.collider.gameObject.transform.position);
+                offset = shootHit.collider.gameObject.transform.position - avatarCamera.ScreenToWorldPoint(new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z));
                 shootHit.collider.gameObject.transform.rotation = Quaternion.identity;
             }
         }
@@ -49,7 +52,7 @@ public class ObjectDrag : MonoBehaviour {
         if (dragPossible) {
 
             Vector3 curScreenPoint = new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z);
-            Vector3 curPosition = Camera.main.ScreenToWorldPoint(curScreenPoint) + offset;
+            Vector3 curPosition = avatarCamera.ScreenToWorldPoint(curScreenPoint) + offset;
             Vector3 zonePosition = zone.transform.position;
 
             shootHit.collider.gameObject.transform.position = curPosition;
@@ -77,7 +80,7 @@ public class ObjectDrag : MonoBehaviour {
 
 	// Update is called once per frame
 	void Update () {
-        Vector3 handScreenPoint = Camera.main.WorldToScreenPoint(transform.position);
+        Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
         if(controllerOn) {
             if (Input.GetButtonDown("Fire1")) {
                 if(!dragPossible) {
