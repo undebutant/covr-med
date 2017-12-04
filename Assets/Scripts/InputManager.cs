@@ -1,14 +1,14 @@
 ﻿using UnityEngine;
 using System.Collections;
+using UnityEngine.Networking;
 
 public class InputManager : MonoBehaviour {
     //ModeManager
     public ModeManager modeManager;
 
-
     // Transform and Rigibody of the main camera
-    public Transform cameraTransform;
-    public Rigidbody cameraRigidbody;
+    public Transform playerTransform;
+    public Rigidbody playerRigidbody;
 
     // Sensitivity variables
     public float sensitivityXAxis;
@@ -50,26 +50,27 @@ public class InputManager : MonoBehaviour {
             float zMove = -Input.GetAxis("Horizontal") * Mathf.Sin(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Cos(cameraTransform.rotation.eulerAngles.y * Mathf.PI / 180);
 
             // Applying rotations
-            rotateCamera(new Vector3(-rotationY, rotationX, 0));
+            rotatePlayer(new Vector3(-rotationY, rotationX, 0));
 
             // Applying movements
-            moveCamera(new Vector3(xMove, yMove, zMove) * speed);
+			if (!isServer) {
+				movePlayer(new Vector3(xMove, yMove, zMove) * speed);
+			}
         } else {
-            moveCamera(new Vector3(0, 0, 0));
+            movePlayer(new Vector3(0, 0, 0));
         }
-        
     }
 
 
-    void rotateCamera(Vector3 rotation) {
+    void rotatePlayer(Vector3 rotation) {
         // Cancelling angular velocity on the rotation
-        cameraRigidbody.angularVelocity = new Vector3(0,0,0);
+        playerRigidbody.angularVelocity = new Vector3(0,0,0);
 
-        cameraTransform.localEulerAngles = rotation;
+        playerTransform.localEulerAngles = rotation;
     }
 
 
-    void moveCamera(Vector3 move) {
-        cameraRigidbody.velocity = move;
+    void movePlayer(Vector3 move) {
+        playerRigidbody.velocity = move;
     }
 }
