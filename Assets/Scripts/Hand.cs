@@ -6,6 +6,8 @@ public class Hand : MonoBehaviour {
 
     public ObjectDrag objectDrag;
 
+    public Camera avatarCamera;
+
     float zPosition;
     Vector3 offset;
     Vector3 cursorPosition;
@@ -14,7 +16,7 @@ public class Hand : MonoBehaviour {
     // Use this for initialization
     void Start () {
         zPosition = transform.position.z;
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
 
     }
 
@@ -22,7 +24,7 @@ public class Hand : MonoBehaviour {
     // Update is called once per frame
     void Update () {
         if(objectDrag.controllerOn) {
-            Vector3 handScreenPoint = Camera.main.WorldToScreenPoint(transform.position);
+            Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
 
             cursorPosition = handScreenPoint;
 
@@ -30,15 +32,15 @@ public class Hand : MonoBehaviour {
 
             cursorPosition.y = cursorPosition.y + Input.GetAxis("VerticalDpad") * Time.deltaTime * speed;
 
-            offset = transform.position - Camera.main.ScreenToWorldPoint(cursorPosition);
-            transform.position = Camera.main.ScreenToWorldPoint(cursorPosition + offset);
+            offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
+            transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
 
 
         } else {
             cursorPosition = Input.mousePosition;
             
-            offset = transform.position - Camera.main.ScreenToWorldPoint(cursorPosition);
-            transform.position = Camera.main.ScreenToWorldPoint(cursorPosition + offset);
+            offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
+            transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
         }
         
 
