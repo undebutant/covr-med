@@ -2,8 +2,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Networking;
 
 public class ObjectDrag : MonoBehaviour {
+
+    public PlayerMoveObject playerMoveObject;
+
     //TODO changer
     public Boolean controllerOn;
 
@@ -55,7 +59,9 @@ public class ObjectDrag : MonoBehaviour {
             Vector3 curPosition = avatarCamera.ScreenToWorldPoint(curScreenPoint) + offset;
             Vector3 zonePosition = zone.transform.position;
 
-            shootHit.collider.gameObject.transform.position = curPosition;
+            //shootHit.collider.gameObject.transform.position = curPosition;
+
+            playerMoveObject.moveObject(shootHit.collider.gameObject, curPosition, shootHit.collider.gameObject.transform.rotation);
 
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             zone.GetComponent<Renderer>().material.color = (distance < closeDistance) ? closeColor : normalColor;
@@ -68,8 +74,10 @@ public class ObjectDrag : MonoBehaviour {
             Vector3 zonePosition = zone.transform.position;
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             if (distance < closeDistance) {
-                shootHit.collider.gameObject.transform.position = zone.transform.position + new Vector3(0, shootHit.collider.gameObject.transform.localScale.y/2.0f, 0);
-                shootHit.collider.gameObject.transform.rotation = zone.transform.rotation;
+                Vector3 newPos = zone.transform.position + new Vector3(0, shootHit.collider.gameObject.transform.localScale.y/2.0f, 0);
+
+                playerMoveObject.moveObject(shootHit.collider.gameObject, newPos, zone.transform.rotation);
+
                 zone.GetComponent<Renderer>().material.color = normalColor;
             } else {
                 zone.GetComponent<Renderer>().material.color = normalColor; //le bug fix avant le bug

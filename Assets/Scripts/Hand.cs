@@ -16,7 +16,7 @@ public class Hand : MonoBehaviour {
     // Use this for initialization
     void Start () {
         zPosition = transform.position.z;
-        Cursor.visible = false;
+        Cursor.lockState = CursorLockMode.Locked;
 
     }
 

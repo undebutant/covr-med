@@ -39,7 +39,6 @@ public class NetworkAvatarSetup : NetworkBehaviour {
         surgeonSpawner = GameObject.FindGameObjectWithTag("SurgeonSpawner");
         nurseSpawner = GameObject.FindGameObjectWithTag("NurseSpawner");
 
-
         if (isLocalPlayer) {
             // Enabling the avatar's camera
             playerCamera.SetActive(true);
