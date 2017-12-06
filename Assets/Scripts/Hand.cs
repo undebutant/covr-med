@@ -31,51 +31,19 @@ public class Hand : MonoBehaviour {
             cursorPosition.x = cursorPosition.x + Input.GetAxis("HorizontalDpad")*Time.deltaTime * speed ;
 
             cursorPosition.y = cursorPosition.y + Input.GetAxis("VerticalDpad") * Time.deltaTime * speed;
-
+            cursorPosition.z = 0.666f;
             offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
             transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
 
 
         } else {
             cursorPosition = Input.mousePosition;
-            
+            cursorPosition.z = 0.666f;
             offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
             transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
         }
-        if(Input.GetButton("HandFront")) {
-            Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
-
-            cursorPosition = handScreenPoint;
-
-
-
-            cursorPosition.z = cursorPosition.z - Time.deltaTime;
-
-            if(cursorPosition.z<0.3) {
-                cursorPosition.z = 0.3f;
-            }
-
-            offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
-            transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
-        }
-
-        if (Input.GetButton("HandBack")) {
-            Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
-
-            cursorPosition = handScreenPoint;
-
-            
-
-            cursorPosition.z = cursorPosition.z + Time.deltaTime;
-
-            if (cursorPosition.z > 0.75) {
-                cursorPosition.z = 0.75f;
-            }
-
-
-            offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
-            transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
-        }
+        
+        
 
     }
 }

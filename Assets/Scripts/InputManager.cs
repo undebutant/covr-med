@@ -52,9 +52,16 @@ public class InputManager : NetworkBehaviour {
             yMove -= 1;
         }
 
+
+        float xMove;
+        float zMove;
         // Calculating movements in the current plan
-        float xMove = Input.GetAxis("Horizontal") * Mathf.Cos(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Sin(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180);
-        float zMove = -Input.GetAxis("Horizontal") * Mathf.Sin(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Cos(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180);
+        
+        xMove = Input.GetAxis("Horizontal") * Mathf.Cos(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Sin(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180);
+        zMove = -Input.GetAxis("Horizontal") * Mathf.Sin(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Cos(playerTransform.rotation.eulerAngles.y * Mathf.PI / 180);
+        
+            
+        
 
         // Applying rotations
         rotatePlayer(new Vector3(-rotationY, rotationX, 0));
