@@ -92,7 +92,12 @@ public class ObjectDrag : MonoBehaviour {
             Vector3 zonePosition = zone.transform.position;
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             if (distance < closeDistance) {
-                Vector3 newPos = zone.transform.position + new Vector3(0, shootHit.collider.gameObject.transform.localScale.y/2.0f, 0);
+                
+                Vector3 newPos = zone.transform.position ;
+
+                if(shootHit.collider.gameObject.CompareTag("Cube")) {
+                    newPos = newPos + new Vector3(0, shootHit.collider.gameObject.transform.lossyScale.y / 2.0f, 0);
+                }
 
                 playerMoveObject.moveObject(shootHit.collider.gameObject, newPos, zone.transform.rotation);
 
