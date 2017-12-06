@@ -42,7 +42,40 @@ public class Hand : MonoBehaviour {
             offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
             transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
         }
-        
+        if(Input.GetButton("HandFront")) {
+            Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
+
+            cursorPosition = handScreenPoint;
+
+
+
+            cursorPosition.z = cursorPosition.z - Time.deltaTime;
+
+            if(cursorPosition.z<0.3) {
+                cursorPosition.z = 0.3f;
+            }
+
+            offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
+            transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
+        }
+
+        if (Input.GetButton("HandBack")) {
+            Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
+
+            cursorPosition = handScreenPoint;
+
+            
+
+            cursorPosition.z = cursorPosition.z + Time.deltaTime;
+
+            if (cursorPosition.z > 0.75) {
+                cursorPosition.z = 0.75f;
+            }
+
+
+            offset = transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
+            transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition + offset);
+        }
 
     }
 }
