@@ -9,6 +9,14 @@ public class CanvasController : MonoBehaviour {
     XmlDocument instructionsDoc;
     XmlNode root;
 
+    /// <summary>
+    ///     Sets the shown text
+    /// </summary>
+    /// <param name="text"></param>
+    public void SetText(string text) {
+        gameObject.GetComponentInChildren<Text>().text = text;
+    }
+
     // Use this for initialization
     void Start () {
         instructionsDoc = new XmlDocument();
@@ -23,7 +31,7 @@ public class CanvasController : MonoBehaviour {
         //    }
         //}
 
-        gameObject.GetComponentInChildren<Text>().text = root.ChildNodes[0].InnerText;
+        //gameObject.GetComponentInChildren<Text>().text = root.ChildNodes[0].InnerText;
     }
 	
 	// Update is called once per frame
