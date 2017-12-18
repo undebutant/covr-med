@@ -23,6 +23,7 @@ public class ObjectDrag : MonoBehaviour {
     bool dragPossible;
     Vector3 offset;
     Vector3 objectScreenPoint;
+    float zOrigin;
 
     //Variables de snap
     GameObject zone;
@@ -48,6 +49,7 @@ public class ObjectDrag : MonoBehaviour {
                 objectScreenPoint = avatarCamera.WorldToScreenPoint(shootHit.collider.gameObject.transform.position);
                 offset = shootHit.collider.gameObject.transform.position - avatarCamera.ScreenToWorldPoint(new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z));
                 shootHit.collider.gameObject.transform.rotation = Quaternion.identity;
+                zOrigin = 0;
             }
         }
     }
@@ -55,7 +57,23 @@ public class ObjectDrag : MonoBehaviour {
     void moveObject(Vector3 handScreenPoint) {
         if (dragPossible) {
 
-            Vector3 curScreenPoint = new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z);
+            if (Input.GetButton("HandFront")) {
+                zOrigin -= Time.deltaTime;
+                if(objectScreenPoint.z + zOrigin< handScreenPoint.z - 0.20) {
+                    zOrigin = handScreenPoint.z  - 0.20f - objectScreenPoint.z;
+                }
+            }
+
+            if (Input.GetButton("HandBack")) {
+                zOrigin += Time.deltaTime;
+
+                if (objectScreenPoint.z + zOrigin > handScreenPoint.z +0.40) {
+                    zOrigin = handScreenPoint.z +0.40f - objectScreenPoint.z;
+                }
+            }
+
+
+            Vector3 curScreenPoint = new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z + zOrigin);
             Vector3 curPosition = avatarCamera.ScreenToWorldPoint(curScreenPoint) + offset;
             Vector3 zonePosition = zone.transform.position;
 
@@ -74,7 +92,12 @@ public class ObjectDrag : MonoBehaviour {
             Vector3 zonePosition = zone.transform.position;
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             if (distance < closeDistance) {
-                Vector3 newPos = zone.transform.position + new Vector3(0, shootHit.collider.gameObject.transform.localScale.y/2.0f, 0);
+                
+                Vector3 newPos = zone.transform.position ;
+
+                if(shootHit.collider.gameObject.CompareTag("Cube")) {
+                    newPos = newPos + new Vector3(0, shootHit.collider.gameObject.transform.lossyScale.y / 2.0f, 0);
+                }
 
                 playerMoveObject.moveObject(shootHit.collider.gameObject, newPos, zone.transform.rotation);
 
