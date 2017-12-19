@@ -45,6 +45,8 @@ public class ObjectDrag : MonoBehaviour {
         Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
         if (Physics.Raycast(ray, out shootHit, range)) {
             if (shootHit.collider.gameObject.layer == layerSelectionable) {
+				//Find the scenario manager to tell him the object was selected
+				GameObject.Find("ScenarioManager").GetComponent<Scenario>().SetSelectedObject(shootHit.collider.gameObject);
                 dragPossible = true;
                 objectScreenPoint = avatarCamera.WorldToScreenPoint(shootHit.collider.gameObject.transform.position);
                 offset = shootHit.collider.gameObject.transform.position - avatarCamera.ScreenToWorldPoint(new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z));
@@ -89,6 +91,9 @@ public class ObjectDrag : MonoBehaviour {
 
     void releaseObject() {
         if (dragPossible) {
+			//Update the scenario manager
+			GameObject.Find("ScenarioManager").GetComponent<Scenario>().UnsetSelectedObject(shootHit.collider.gameObject);
+
             Vector3 zonePosition = zone.transform.position;
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             if (distance < closeDistance) {

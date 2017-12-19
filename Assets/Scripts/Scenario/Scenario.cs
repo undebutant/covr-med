@@ -48,14 +48,14 @@ public class Scenario : MonoBehaviour {
         return Vector3.Distance(obj1.transform.position, obj2.transform.position) < radius ? true : false;
     }
 
-    void SetSelectedObject(GameObject selectedObject) {
+    public void SetSelectedObject(GameObject selectedObject) {
         foreach(Selectable selectableObject in selectableObjects) {
             if (selectableObject.associatedObject == selectedObject)
                 selectableObject.IsSelected = true;
         }
     }
 
-    void UnsetSelectedObject(GameObject releasedObject) {
+    public void UnsetSelectedObject(GameObject releasedObject) {
         foreach (Selectable selectableObject in selectableObjects) {
             if (selectableObject.associatedObject == releasedObject)
                 selectableObject.IsSelected = false;
@@ -67,8 +67,12 @@ public class Scenario : MonoBehaviour {
             if (selectableObject.IsSelected)
                 return selectableObject.associatedObject;
         }
-        return null;
+		return null;
     }
+		
+	public void MoveToNextStep() {
+		currentStep = steps [steps.IndexOf(currentStep) + 1]; //Dégueulasse, à changer aussi, opter pour un indexage au lieu d'enregistrer directement l'étape courante dans currentStep
+	}
 
 
 
@@ -151,16 +155,29 @@ public class Scenario : MonoBehaviour {
         displayer.GetComponent<CanvasController>().SetText(currentStep.CurrentSubStep.Instruction);
         if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.UserNextToSelectableObject) {
             GameObject user = currentStep.CurrentSubStep.UserId == 0 ? GameObject.Find("Camera") : GameObject.Find("Camera"); //    Awful, TODO : manage the logic behind the users
-            Debug.Log(CheckDistance(user, selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject, userObjectAccomplishingDistance));
+            Debug.Log("Check distance : " + CheckDistance(user, selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject, userObjectAccomplishingDistance));
             if(CheckDistance(user, selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject, userObjectAccomplishingDistance)) {
                 currentStep.MoveToNextSubStep();
             }
         }
+		if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.UserNextToStationaryObject) {
+			GameObject user = currentStep.CurrentSubStep.UserId == 0 ? GameObject.Find("Camera") : GameObject.Find("Camera"); //    Awful, TODO : manage the logic behind the users
+			Debug.Log("Check distance : " + CheckDistance(user, stationaryObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject, userObjectAccomplishingDistance));
+			if(CheckDistance(user, stationaryObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject, userObjectAccomplishingDistance)) {
+				currentStep.MoveToNextSubStep();
+			}
+		}
         else if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.ObjectSelected) {
             GameObject user = currentStep.CurrentSubStep.UserId == 0 ? GameObject.Find("Camera") : GameObject.Find("Camera"); //    Awful, TODO : manage the logic behind the users
             if (GetSelectedObject() == selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject) {
                 currentStep.MoveToNextSubStep();
             }
         }
+		else if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.ObjectReleased) {
+			GameObject user = currentStep.CurrentSubStep.UserId == 0 ? GameObject.Find("Camera") : GameObject.Find("Camera"); //    Awful, TODO : manage the logic behind the users
+			if (GetSelectedObject() == null) {
+				currentStep.MoveToNextSubStep();
+			}
+		}
     }
 }
