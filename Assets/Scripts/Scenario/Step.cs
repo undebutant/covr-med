@@ -48,6 +48,6 @@ public class Step {
 		if (currentSubStep.Number + 1 < subSteps.Count)
 			currentSubStep = subSteps [currentSubStep.Number + 1];
 		else
-			GameObject.Find ("ScenarioManager").GetComponent<Scenario> ().MoveToNextStep ();
+			GameObject.Find("ScenarioManager").GetComponent<Scenario>().MoveToNextStep();
     }
 }

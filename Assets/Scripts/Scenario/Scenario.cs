@@ -25,10 +25,10 @@ public class Scenario : MonoBehaviour {
 
     //  Steps and substeps
     List<Step> steps;
-    Step currentStep;
+    int currentStepId;
 
     //  Distance needed between a user and an object for the step to be considered as done
-    public float userObjectAccomplishingDistance = 10.0f;
+    public float userObjectAccomplishingDistance = 3.0f;
 
     //  Displayer
     public GameObject displayer;
@@ -71,7 +71,10 @@ public class Scenario : MonoBehaviour {
     }
 		
 	public void MoveToNextStep() {
-		currentStep = steps [steps.IndexOf(currentStep) + 1]; //Dégueulasse, à changer aussi, opter pour un indexage au lieu d'enregistrer directement l'étape courante dans currentStep
+        if (currentStepId + 1 < steps.Count)
+            currentStepId++;
+        else
+            Debug.Log("Reached the end of the scenario, there is no more step after the current one");
 	}
 
 
@@ -143,7 +146,7 @@ public class Scenario : MonoBehaviour {
         }
 
         //  Set current step
-        currentStep = steps[0];
+        currentStepId = 0;
 
         //  Debug Zone
         Debug.Log(selectableObjects[0].associatedObject.name);
@@ -151,6 +154,7 @@ public class Scenario : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        Step currentStep = steps[currentStepId];
         Debug.Log(currentStep.CurrentSubStep.AccomplishmentCondition);
         displayer.GetComponent<CanvasController>().SetText(currentStep.CurrentSubStep.Instruction);
         if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.UserNextToSelectableObject) {
