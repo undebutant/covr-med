@@ -2,52 +2,79 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.Networking;
 
+
+/// <summary>
+///     Script allowing snap, drag and drop for specific objects in the scene
+///     Objects need to have a NetworkIdentity, to be in the "selectionable" layer,
+///     and to have a collider for the raycast
+/// </summary>
 public class ObjectDrag : MonoBehaviour {
 
-    public PlayerMoveObject playerMoveObject;
-
-    //TODO changer
-    public Boolean controllerOn;
-
-    public Camera avatarCamera;
-
-    //Variables du raycast
     [SerializeField]
-    int range=1000;
-    int layerSelectionable;
+    [Tooltip("The network script attached in order to synchronise the drag and drop online")]
+    PlayerMoveObject playerMoveObject;
+
+    // TODO use network menu to choose the controller
+    [SerializeField]
+    [Tooltip("Indicates if the player is using a controller")]
+    Boolean controllerOn;
+
+    [SerializeField]
+    [Tooltip("The camera linked to the player avatar")]
+    Camera avatarCamera;
+
+    // Raycast parameters
     RaycastHit shootHit;
 
-    //Variable du deplacement
-    bool dragPossible;
-    Vector3 offset;
-    Vector3 objectScreenPoint;
+    [SerializeField]
+    [Tooltip("The max range for the selection raycast")]
+    int range = 1000;
+
+    // Storing the layer mask of the selectionable layer as an int
+    int layerSelectionable;
+
+
+    // Movement variables
+    bool isDragFeatureOn;
+    Vector3 offset;                                 // The distance offset between the camera and the hand - TODO make hand and camera independant
+    Vector3 objectScreenPoint;                      // The projection of the object on the player screen
     float zOrigin;
 
-    //Variables de snap
-    GameObject zone;
-    public float closeDistance = 1.0f;
-    Color closeColor = new Color(0, 1, 0);
+
+    // Snap variables
+    GameObject zone;                                // The area to touch with the object for the snap feature
+    public float closeDistance = 1.0f;              // The maximum range between the snap zone and the object for the snap to work
+    Color closeColor = new Color(0, 1, 0);          // The color of the area whenever a dragged object is nearby
     private Color normalColor = new Color();
 
 
-    // Use this for initialization
+
     void Start () {
+        // Finding the snap area and storing it
         zone = GameObject.FindGameObjectWithTag("Zone");
-        layerSelectionable = LayerMask.NameToLayer("selectionable");
-        dragPossible = false;
         normalColor = zone.GetComponent<Renderer>().material.color;
+
+        // Storing the selectionable layer
+        layerSelectionable = LayerMask.NameToLayer("selectionable");
+
+        isDragFeatureOn = false;
     }
 	
 
     void callRayCast(Vector3 handScreenPoint) {
         Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
+
+        // Whenever the rayCast hits something...
         if (Physics.Raycast(ray, out shootHit, range)) {
+            // ... matching the layer
             if (shootHit.collider.gameObject.layer == layerSelectionable) {
-                dragPossible = true;
+                isDragFeatureOn = true;
+
                 objectScreenPoint = avatarCamera.WorldToScreenPoint(shootHit.collider.gameObject.transform.position);
                 offset = shootHit.collider.gameObject.transform.position - avatarCamera.ScreenToWorldPoint(new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z));
+
+                // Resetting rotation of object selected
                 shootHit.collider.gameObject.transform.rotation = Quaternion.identity;
                 zOrigin = 0;
             }
@@ -55,7 +82,7 @@ public class ObjectDrag : MonoBehaviour {
     }
 
     void moveObject(Vector3 handScreenPoint) {
-        if (dragPossible) {
+        if (isDragFeatureOn) {
 
             if (Input.GetButton("HandFront")) {
                 zOrigin -= Time.deltaTime;
@@ -88,7 +115,7 @@ public class ObjectDrag : MonoBehaviour {
     }
 
     void releaseObject() {
-        if (dragPossible) {
+        if (isDragFeatureOn) {
             Vector3 zonePosition = zone.transform.position;
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             if (distance < closeDistance) {
@@ -106,7 +133,7 @@ public class ObjectDrag : MonoBehaviour {
                 zone.GetComponent<Renderer>().material.color = normalColor; //le bug fix avant le bug
             }
         }
-        dragPossible = false;
+        isDragFeatureOn = false;
     }
 
 	// Update is called once per frame
@@ -114,7 +141,7 @@ public class ObjectDrag : MonoBehaviour {
         Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
         if(controllerOn) {
             if (Input.GetButtonDown("Fire1")) {
-                if(!dragPossible) {
+                if(!isDragFeatureOn) {
                     callRayCast(handScreenPoint);
                 } else {
                     releaseObject();
