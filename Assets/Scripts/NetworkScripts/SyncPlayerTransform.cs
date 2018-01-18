@@ -5,7 +5,7 @@ using UnityEngine.Networking;
 
 
 /// <summary>
-///     Script to synchronise the transform of all of the players avatars
+///     Script to synchronise the transform of all of the players avatars with smoothness
 /// </summary>
 public class SyncPlayerTransform : NetworkBehaviour {
 
@@ -22,21 +22,23 @@ public class SyncPlayerTransform : NetworkBehaviour {
     float slerpingTime;
 
 
-    // The position sent by the client's GameObject, that we went to synchronise to
+    // Disclaimer : SyncVar means that everytime a change is made server side, it is automatically send to all clients
+    // DOES NOT WORK WHEN A CHANGE IS MADE CLIENT SIDE
+
     [SyncVar]
     private Vector3 targetPosition;
 
-    // The rotation sent by the client's GameObject, that we went to synchronise to
     [SyncVar]
     private Quaternion targetRotation;
 
 
     private void FixedUpdate() {
-        // Update the position and rotation only if this avatar is not controlled locally
+        // Synchronise the position and rotation only if this avatar is not controlled locally
         if (!isLocalPlayer) {
             LerpPosition();
             SlerpRotation();
         }
+        // Else we send the movement to the server
         else {
             TransmitPositionToServer();
         }
@@ -53,7 +55,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
 
 
     /// <summary>
-    ///     The method called on the server side, to update the target position and rotation for this avatar on every other instance of the application
+    ///     The method called on the client side, used to push the new target position and target rotation to the server
     /// </summary>
     [Command]
     private void CmdProvidePositionToServer(Vector3 positionReceived, Quaternion rotationReceived) {
@@ -62,12 +64,12 @@ public class SyncPlayerTransform : NetworkBehaviour {
     }
 
     /// <summary>
-    ///     The method called on the client side by the avatar, in order to inform the server of its new position and rotation
+    ///     The method called on the client side to update the position of its own avatar on the server
     /// </summary>
     [ClientCallback]
     private void TransmitPositionToServer() {
         if (isLocalPlayer) {
-            // Calling the server side command to synchronise the transform
+            // Calling the command to synchronise the transform
             CmdProvidePositionToServer(selfTransform.position, selfTransform.rotation);
         }
     }

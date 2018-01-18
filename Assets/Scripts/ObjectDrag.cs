@@ -5,9 +5,9 @@ using UnityEngine;
 
 
 /// <summary>
-///     Script allowing snap, drag and drop for specific objects in the scene
+///     Script allowing snap, drag and drop for specific objects in the scene.
 ///     Objects need to have a NetworkIdentity, to be in the "selectionable" layer,
-///     and to have a collider for the raycast
+///     and to have a collider for the raycast.
 /// </summary>
 public class ObjectDrag : MonoBehaviour {
 
@@ -39,8 +39,8 @@ public class ObjectDrag : MonoBehaviour {
 
     GameObject lastGameObjectHitByRaycast;
 
-    // Storing the layer mask of the selectionable layer as an int
-    int layerSelectionable;
+    // Storing the layer mask of the "selectionable" layer as an int
+    int layerSelectable;
 
 
     // Movement variables
@@ -56,29 +56,42 @@ public class ObjectDrag : MonoBehaviour {
     private Color normalColor = new Color();
 
 
+
     void Start () {
         // Finding the snap area and storing it
         zone = GameObject.FindGameObjectWithTag("Zone");
         normalColor = zone.GetComponent<Renderer>().material.color;
 
-        // Storing the selectionable layer
-        layerSelectionable = LayerMask.NameToLayer("selectionable");
+        // Storing the selectable layer
+        layerSelectable = LayerMask.NameToLayer("selectionable");
 
         isDragFeatureOn = false;
         lastGameObjectHitByRaycast = null;
     }
 	
+
+    /// <summary>
+    ///     Raycast done regularly to highlight selectable objects
+    ///     TODO factorise code with the following method
+    /// </summary>
     void callRayCastHighlight () {
         Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
+
+        // Whenever the rayCast hits something...
         if (Physics.Raycast(ray, out shootHitHL, range)) {
-            if (shootHitHL.collider.gameObject.layer == layerSelectionable) {
+            // ... matching the layer
+            if (shootHitHL.collider.gameObject.layer == layerSelectable) {
                if(lastGameObjectHitByRaycast==null) {
+                    // Shading the new object hit to highlight it
                     lastGameObjectHitByRaycast = shootHitHL.collider.gameObject;
                     shaderNormal = lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader ;
                     lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader = shaderHighLight;
                 } else {
                     if(lastGameObjectHitByRaycast!= shootHitHL.collider.gameObject) {
+                        // Shading the previous object back to normal
                         lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader = shaderNormal;
+
+                        // Shading the new object hit to highlight it
                         lastGameObjectHitByRaycast = shootHitHL.collider.gameObject;
                         shaderNormal = lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader;
                         lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader = shaderHighLight;
@@ -98,13 +111,17 @@ public class ObjectDrag : MonoBehaviour {
         }
     }
 
+
+    /// <summary>
+    ///     Raycast called on player click to enable drag mode
+    /// </summary>
     void callRayCast(Vector3 handScreenPoint) {
         Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
 
         // Whenever the rayCast hits something...
         if (Physics.Raycast(ray, out shootHit, range)) {
             // ... matching the layer
-            if (shootHit.collider.gameObject.layer == layerSelectionable) {
+            if (shootHit.collider.gameObject.layer == layerSelectable) {
 				//Find the scenario manager to tell him the object was selected
 				GameObject.Find("ScenarioManager").GetComponent<Scenario>().SetSelectedObject(shootHit.collider.gameObject);
 
@@ -121,69 +138,92 @@ public class ObjectDrag : MonoBehaviour {
         }
     }
 
+
     void moveObject(Vector3 handScreenPoint) {
         if (isDragFeatureOn) {
-
+            // If the player hits the button to pull the object closer
             if (Input.GetButton("HandFront")) {
                 zOrigin -= Time.deltaTime;
-                if(objectScreenPoint.z + zOrigin< handScreenPoint.z - 0.20) {
+
+                // Limiting the minimum distance between the player and the object
+                if (objectScreenPoint.z + zOrigin < handScreenPoint.z - 0.20) {
                     zOrigin = handScreenPoint.z  - 0.20f - objectScreenPoint.z;
                 }
             }
 
+            // If the player hits the button to push the object farther
             if (Input.GetButton("HandBack")) {
                 zOrigin += Time.deltaTime;
 
+                // Limiting the maximum distance between the player and the object
                 if (objectScreenPoint.z + zOrigin > handScreenPoint.z +0.40) {
                     zOrigin = handScreenPoint.z +0.40f - objectScreenPoint.z;
                 }
             }
 
 
+            // The vector storing the position of the hand as projected on the screen, with z the output of the object projection on the screen
             Vector3 curScreenPoint = new Vector3(handScreenPoint.x, handScreenPoint.y, objectScreenPoint.z + zOrigin);
+
+            // The in world position of the object, considering the hand x and y coordinates
             Vector3 curPosition = avatarCamera.ScreenToWorldPoint(curScreenPoint) + offset;
+
             Vector3 zonePosition = zone.transform.position;
 
+            // TODO apply local change immediatly
             //shootHit.collider.gameObject.transform.position = curPosition;
 
+            // Calling the synchronise online method to propagate the movement
+            // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
             playerMoveObject.moveObject(shootHit.collider.gameObject, curPosition, shootHit.collider.gameObject.transform.rotation);
 
+
+            // Checking whether or not the object is close enough to highlight the snap zone
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             zone.GetComponent<Renderer>().material.color = (distance < closeDistance) ? closeColor : normalColor;
-
         }
     }
+
 
     void releaseObject() {
         if (isDragFeatureOn) {
-			//Update the scenario manager
+			// Update the scenario manager
 			GameObject.Find("ScenarioManager").GetComponent<Scenario>().UnsetSelectedObject(shootHit.collider.gameObject);
 
             Vector3 zonePosition = zone.transform.position;
+
+            // Checking whether or not the object is close enough to snap the object
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             if (distance < closeDistance) {
-                
-                Vector3 newPos = zone.transform.position ;
+                Vector3 newPos = zone.transform.position;
 
-                if(shootHit.collider.gameObject.CompareTag("Cube")) {
+                // Fix needed when the transform is not at the bottom of the object
+                // Fix done for the cube
+                if (shootHit.collider.gameObject.CompareTag("Cube")) {
                     newPos = newPos + new Vector3(0, shootHit.collider.gameObject.transform.lossyScale.y / 2.0f, 0);
                 }
 
+                // Calling the synchronise online method to propagate the movement
+                // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
                 playerMoveObject.moveObject(shootHit.collider.gameObject, newPos, zone.transform.rotation);
-
-                zone.GetComponent<Renderer>().material.color = normalColor;
-            } else {
-                zone.GetComponent<Renderer>().material.color = normalColor; //le bug fix avant le bug
             }
+
+            // Resetting the color since the object is no longer held
+            zone.GetComponent<Renderer>().material.color = normalColor;
         }
+
         isDragFeatureOn = false;
     }
 
-	// Update is called once per frame
+
+
 	void Update () {
         Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
+
         callRayCastHighlight();
+
         if (controllerOn) {
+            // Toggle drag mode
             if (Input.GetButtonDown("Fire1")) {
                 if(!isDragFeatureOn) {
                     callRayCast(handScreenPoint);
@@ -192,8 +232,8 @@ public class ObjectDrag : MonoBehaviour {
                 }
             }
 
-            moveObject(handScreenPoint);
         } else {
+            // Hold drag mode
             if (Input.GetButtonDown("Fire1")) {
                 callRayCast(handScreenPoint);
             }
@@ -201,8 +241,8 @@ public class ObjectDrag : MonoBehaviour {
             if (Input.GetButtonUp("Fire1")) {
                 releaseObject();
             }
-
-            moveObject(handScreenPoint);
         }
+
+        moveObject(handScreenPoint);
     } 
 }
