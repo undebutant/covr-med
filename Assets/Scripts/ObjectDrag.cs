@@ -16,20 +16,28 @@ public class ObjectDrag : MonoBehaviour {
     PlayerMoveObject playerMoveObject;
 
     // TODO use network menu to choose the controller
-    [SerializeField]
     [Tooltip("Indicates if the player is using a controller")]
-    Boolean controllerOn;
+    public Boolean controllerOn;
 
     [SerializeField]
     [Tooltip("The camera linked to the player avatar")]
     Camera avatarCamera;
 
-    // Raycast parameters
-    RaycastHit shootHit;
+
+    // Raycasts parameters
+    RaycastHit shootHit;                        // On click rayCast
+    RaycastHit shootHitHL;                      // Passiv rayCast for highlighting
 
     [SerializeField]
     [Tooltip("The max range for the selection raycast")]
     int range = 1000;
+
+    [SerializeField]
+    [Tooltip("The shader to apply on the object whenever a passiv raycast hit")]
+    Shader shaderHighLight;
+    Shader shaderNormal;
+
+    GameObject lastGameObjectHitByRaycast;
 
     // Storing the layer mask of the selectionable layer as an int
     int layerSelectionable;
@@ -37,17 +45,15 @@ public class ObjectDrag : MonoBehaviour {
 
     // Movement variables
     bool isDragFeatureOn;
+    float zOrigin;                                  // The distance between the selected object and the player camera when grabbed
     Vector3 offset;                                 // The distance offset between the camera and the hand - TODO make hand and camera independant
     Vector3 objectScreenPoint;                      // The projection of the object on the player screen
-    float zOrigin;
-
 
     // Snap variables
     GameObject zone;                                // The area to touch with the object for the snap feature
     public float closeDistance = 1.0f;              // The maximum range between the snap zone and the object for the snap to work
     Color closeColor = new Color(0, 1, 0);          // The color of the area whenever a dragged object is nearby
     private Color normalColor = new Color();
-
 
 
     void Start () {
@@ -59,8 +65,38 @@ public class ObjectDrag : MonoBehaviour {
         layerSelectionable = LayerMask.NameToLayer("selectionable");
 
         isDragFeatureOn = false;
+        lastGameObjectHitByRaycast = null;
     }
 	
+    void callRayCastHighlight () {
+        Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
+        if (Physics.Raycast(ray, out shootHitHL, range)) {
+            if (shootHitHL.collider.gameObject.layer == layerSelectionable) {
+               if(lastGameObjectHitByRaycast==null) {
+                    lastGameObjectHitByRaycast = shootHitHL.collider.gameObject;
+                    shaderNormal = lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader ;
+                    lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader = shaderHighLight;
+                } else {
+                    if(lastGameObjectHitByRaycast!= shootHitHL.collider.gameObject) {
+                        lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader = shaderNormal;
+                        lastGameObjectHitByRaycast = shootHitHL.collider.gameObject;
+                        shaderNormal = lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader;
+                        lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader = shaderHighLight;
+                    }
+                }
+            } else {
+                if (lastGameObjectHitByRaycast != null) {
+                    lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader = shaderNormal;
+                    lastGameObjectHitByRaycast = null;
+                }
+            }
+        } else {
+            if (lastGameObjectHitByRaycast != null) {
+                lastGameObjectHitByRaycast.GetComponent<Renderer>().material.shader = shaderNormal;
+                lastGameObjectHitByRaycast = null;
+            }
+        }
+    }
 
     void callRayCast(Vector3 handScreenPoint) {
         Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
@@ -69,6 +105,9 @@ public class ObjectDrag : MonoBehaviour {
         if (Physics.Raycast(ray, out shootHit, range)) {
             // ... matching the layer
             if (shootHit.collider.gameObject.layer == layerSelectionable) {
+				//Find the scenario manager to tell him the object was selected
+				GameObject.Find("ScenarioManager").GetComponent<Scenario>().SetSelectedObject(shootHit.collider.gameObject);
+
                 isDragFeatureOn = true;
 
                 objectScreenPoint = avatarCamera.WorldToScreenPoint(shootHit.collider.gameObject.transform.position);
@@ -76,6 +115,7 @@ public class ObjectDrag : MonoBehaviour {
 
                 // Resetting rotation of object selected
                 shootHit.collider.gameObject.transform.rotation = Quaternion.identity;
+
                 zOrigin = 0;
             }
         }
@@ -116,6 +156,9 @@ public class ObjectDrag : MonoBehaviour {
 
     void releaseObject() {
         if (isDragFeatureOn) {
+			//Update the scenario manager
+			GameObject.Find("ScenarioManager").GetComponent<Scenario>().UnsetSelectedObject(shootHit.collider.gameObject);
+
             Vector3 zonePosition = zone.transform.position;
             float distance = Vector3.Distance(zonePosition, shootHit.collider.gameObject.transform.position);
             if (distance < closeDistance) {
@@ -139,7 +182,8 @@ public class ObjectDrag : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
-        if(controllerOn) {
+        callRayCastHighlight();
+        if (controllerOn) {
             if (Input.GetButtonDown("Fire1")) {
                 if(!isDragFeatureOn) {
                     callRayCast(handScreenPoint);
