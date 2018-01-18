@@ -7,6 +7,7 @@ using UnityEngine.Networking;
 /// <summary>
 ///     Setup script used at the creation of the local player avatar.
 ///     Heritates from NetworkBehaviour
+///     TODO use network menu as a way to select the role
 /// </summary>
 public class NetworkAvatarSetup : NetworkBehaviour {
 
