@@ -19,6 +19,12 @@ public class ObjectDrag : MonoBehaviour {
     int layerSelectionable;
     RaycastHit shootHit;
 
+    //Variables du raycastHighLight
+    RaycastHit shootHitHL;
+    GameObject lastGameObject;
+    Shader shaderNormal;
+    public Shader shaderHighLight;
+
     //Variable du deplacement
     bool dragPossible;
     Vector3 offset;
@@ -38,8 +44,38 @@ public class ObjectDrag : MonoBehaviour {
         layerSelectionable = LayerMask.NameToLayer("selectionable");
         dragPossible = false;
         normalColor = zone.GetComponent<Renderer>().material.color;
+        lastGameObject = null;
     }
 	
+    void callRayCastHighlight () {
+        Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
+        if (Physics.Raycast(ray, out shootHitHL, range)) {
+            if (shootHitHL.collider.gameObject.layer == layerSelectionable) {
+               if(lastGameObject==null) {
+                    lastGameObject = shootHitHL.collider.gameObject;
+                    shaderNormal = lastGameObject.GetComponent<Renderer>().material.shader ;
+                    lastGameObject.GetComponent<Renderer>().material.shader = shaderHighLight;
+                } else {
+                    if(lastGameObject!= shootHitHL.collider.gameObject) {
+                        lastGameObject.GetComponent<Renderer>().material.shader = shaderNormal;
+                        lastGameObject = shootHitHL.collider.gameObject;
+                        shaderNormal = lastGameObject.GetComponent<Renderer>().material.shader;
+                        lastGameObject.GetComponent<Renderer>().material.shader = shaderHighLight;
+                    }
+                }
+            } else {
+                if (lastGameObject != null) {
+                    lastGameObject.GetComponent<Renderer>().material.shader = shaderNormal;
+                    lastGameObject = null;
+                }
+            }
+        } else {
+            if (lastGameObject != null) {
+                lastGameObject.GetComponent<Renderer>().material.shader = shaderNormal;
+                lastGameObject = null;
+            }
+        }
+    }
 
     void callRayCast(Vector3 handScreenPoint) {
         Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(transform.position));
@@ -117,7 +153,8 @@ public class ObjectDrag : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
         Vector3 handScreenPoint = avatarCamera.WorldToScreenPoint(transform.position);
-        if(controllerOn) {
+        callRayCastHighlight();
+        if (controllerOn) {
             if (Input.GetButtonDown("Fire1")) {
                 if(!dragPossible) {
                     callRayCast(handScreenPoint);
