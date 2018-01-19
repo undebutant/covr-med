@@ -123,7 +123,8 @@ public class ObjectDrag : MonoBehaviour {
             // ... matching the layer
             if (shootHit.collider.gameObject.layer == layerSelectable) {
 				//Find the scenario manager to tell him the object was selected
-				GameObject.Find("ScenarioManager").GetComponent<Scenario>().SetSelectedObject(shootHit.collider.gameObject);
+				//GameObject.Find("ScenarioManager").GetComponent<Scenario>().SetSelectedObject(shootHit.collider.gameObject);
+                //TODO FIX NULL POINTER EXCEPTION, DU COUP DRAG MARCHE PAS
 
                 isDragFeatureOn = true;
 
@@ -187,8 +188,9 @@ public class ObjectDrag : MonoBehaviour {
 
     void releaseObject() {
         if (isDragFeatureOn) {
-			// Update the scenario manager
-			GameObject.Find("ScenarioManager").GetComponent<Scenario>().UnsetSelectedObject(shootHit.collider.gameObject);
+            // Update the scenario manager
+            //GameObject.Find("ScenarioManager").GetComponent<Scenario>().UnsetSelectedObject(shootHit.collider.gameObject);
+            //TODO FIX NULL POINTER EXCEPTION, DU COUP DRAG MARCHE PAS
 
             Vector3 zonePosition = zone.transform.position;
 
