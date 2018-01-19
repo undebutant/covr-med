@@ -31,6 +31,20 @@ public class SyncPlayerTransform : NetworkBehaviour {
     [SyncVar]
     private Quaternion targetRotation;
 
+    [SyncVar]
+    private Vector3 handPosition;
+
+    private Vector3 handPositionLocalToBeSend;
+
+
+
+    public void UpdateHandPosition(Vector3 newPos) {
+        handPositionLocalToBeSend = newPos;
+    }
+
+    public Vector3 getHandPosition() {
+        return handPosition;
+    }
 
     private void FixedUpdate() {
         // Synchronise the position and rotation only if this avatar is not controlled locally
@@ -58,9 +72,10 @@ public class SyncPlayerTransform : NetworkBehaviour {
     ///     The method called on the client side, used to push the new target position and target rotation to the server
     /// </summary>
     [Command]
-    private void CmdProvidePositionToServer(Vector3 positionReceived, Quaternion rotationReceived) {
+    private void CmdProvidePositionToServer(Vector3 positionReceived, Quaternion rotationReceived, Vector3 newHandPosition) {
         targetPosition = positionReceived;
         targetRotation = new Quaternion(0, rotationReceived.y, 0, rotationReceived.w);  // Cancelling rotation on x and z axis to prevent weird moves of the avatar
+        handPosition = newHandPosition;
     }
 
     /// <summary>
@@ -70,7 +85,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
     private void TransmitPositionToServer() {
         if (isLocalPlayer) {
             // Calling the command to synchronise the transform
-            CmdProvidePositionToServer(selfTransform.position, selfTransform.rotation);
+            CmdProvidePositionToServer(selfTransform.position, selfTransform.rotation, handPositionLocalToBeSend);
         }
     }
 }
