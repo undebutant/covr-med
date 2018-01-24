@@ -38,3 +38,8 @@ Assets/HeavyAssets*
 
 # OR_Room bought assets
 Assets/OR_Room*
+
+# CAVE
+Assets/MiddleVR*
+Assets/Editor*
+Assets/Plugin*
