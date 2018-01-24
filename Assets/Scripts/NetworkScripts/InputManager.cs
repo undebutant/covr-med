@@ -6,8 +6,7 @@ using UnityEngine.Networking;
 public class InputManager : NetworkBehaviour {
     public ObjectDrag objectDrag;
 
-    // Transform and Rigibody of the main camera
-
+    // Transform of the camera and Rigibody of the parent
     public Transform playerTransformCamera;
     public Rigidbody playerRigidbody;
 
@@ -79,13 +78,13 @@ public class InputManager : NetworkBehaviour {
     void rotatePlayer(Vector3 rotation) {
         // Cancelling angular velocity on the rotation
         playerRigidbody.angularVelocity = new Vector3(0,0,0);
-
-
+        // Use the transform because we don't want to use collider for the rotation
         playerTransformCamera.localEulerAngles = rotation;
     }
 
 
     void movePlayer(Vector3 move) {
+        // Use the rigidbody to use collider
         playerRigidbody.velocity = move;
     }
 }

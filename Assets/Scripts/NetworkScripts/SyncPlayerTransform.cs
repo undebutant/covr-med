@@ -14,7 +14,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
     Transform selfTransform;
 
     [SerializeField]
-    [Tooltip("The transform of this specific avatar for the rotation")]
+    [Tooltip("The transform of this specific camera for the rotation")]
     Transform selfTransformCamera;
 
     [SerializeField]
@@ -68,10 +68,12 @@ public class SyncPlayerTransform : NetworkBehaviour {
 
 
     private void LerpPosition() {
+        // Translate the parent
         selfTransform.position = Vector3.Lerp(selfTransform.position, targetPosition, Time.deltaTime * lerpingTime);
     }
 
     private void SlerpRotation() {
+        // Rotate the avatar
         selfTransformAvatar.rotation = Quaternion.Slerp(selfTransformAvatar.rotation, targetRotation, Time.deltaTime * slerpingTime);
     }
 
@@ -92,7 +94,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
     [ClientCallback]
     private void TransmitPositionToServer() {
         if (isLocalPlayer) {
-            // Calling the command to synchronise the transform
+            // Calling the command to synchronise the transform (position of the parent and the rotation of the camera)
             CmdProvidePositionToServer(selfTransform.position, selfTransformCamera.rotation, handPositionLocalToBeSend);
         }
     }
