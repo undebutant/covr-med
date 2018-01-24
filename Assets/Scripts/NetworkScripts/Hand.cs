@@ -39,28 +39,23 @@ public class Hand : NetworkBehaviour {
 
                 
                 Vector3 newpos = hand.transform.position;
-                Debug.LogError("New loop");
-                Debug.LogError(newpos);
                 
                 angleHorizontal = angleHorizontal + Input.GetAxis("HorizontalDpad") * Time.deltaTime * speed;
                 angleVertical = angleVertical + Input.GetAxis("VerticalDpad") * Time.deltaTime * speed;
                 angleVertical = Mathf.Clamp(angleVertical, -1, 1);
 
-                //newpos.x = prefabTransform.position.x + Mathf.Cos(angleHorizontal) * 0.66f;
                 newpos.z = prefabTransform.position.z - Mathf.Sin(angleHorizontal) * 0.66f;
                 newpos.x = prefabTransform.position.x + Mathf.Cos(angleHorizontal) * 0.66f + Mathf.Cos(angleVertical) * 0.66f - 0.66f;
                 newpos.y = prefabTransform.position.y + Mathf.Sin(angleVertical) * 0.66f;
 
-                Debug.LogError(newpos);
-                //newpos.y = Mathf.Sin(angleHorizontal);
-                hand.transform.position = newpos;
+                //TODO WARNING, use the value angleHorizontal to move verticaly to fix a bug
 
-                /*
-                cursorPosition.y = cursorPosition.y + Input.GetAxis("VerticalDpad") * Time.deltaTime * speed;
-                cursorPosition.z = 0.666f;*/
+                hand.transform.position = newpos;
+                syncPlayerTransform.UpdateHandPosition(hand.transform.position);
 
 
             } else {
+                //TODO Souris abandonné place à l'haptic
                 /*
                 cursorPosition = Input.mousePosition;
                 cursorPosition.z = 0.666f;
