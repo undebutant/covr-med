@@ -10,8 +10,16 @@ using UnityEngine.Networking;
 public class SyncPlayerTransform : NetworkBehaviour {
 
     [SerializeField]
-    [Tooltip("The transform of this specific avatar")]
+    [Tooltip("The transform of this specific prefab player for the translation")]
     Transform selfTransform;
+
+    [SerializeField]
+    [Tooltip("The transform of this specific camera for the rotation")]
+    Transform selfTransformCamera;
+
+    [SerializeField]
+    [Tooltip("The transform of this specific avatar for the rotation")]
+    Transform selfTransformAvatar;
 
     [SerializeField]
     [Tooltip("The time taken to lerp to the final destination")]
@@ -60,11 +68,13 @@ public class SyncPlayerTransform : NetworkBehaviour {
 
 
     private void LerpPosition() {
+        // Translate the parent
         selfTransform.position = Vector3.Lerp(selfTransform.position, targetPosition, Time.deltaTime * lerpingTime);
     }
 
     private void SlerpRotation() {
-        selfTransform.rotation = Quaternion.Slerp(selfTransform.rotation, targetRotation, Time.deltaTime * slerpingTime);
+        // Rotate the avatar
+        selfTransformAvatar.rotation = Quaternion.Slerp(selfTransformAvatar.rotation, targetRotation, Time.deltaTime * slerpingTime);
     }
 
 
@@ -84,8 +94,8 @@ public class SyncPlayerTransform : NetworkBehaviour {
     [ClientCallback]
     private void TransmitPositionToServer() {
         if (isLocalPlayer) {
-            // Calling the command to synchronise the transform
-            CmdProvidePositionToServer(selfTransform.position, selfTransform.rotation, handPositionLocalToBeSend);
+            // Calling the command to synchronise the transform (position of the parent and the rotation of the camera)
+            CmdProvidePositionToServer(selfTransform.position, selfTransformCamera.rotation, handPositionLocalToBeSend);
         }
     }
 }
