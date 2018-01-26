@@ -9,9 +9,15 @@ public class Hand : NetworkBehaviour {
 
     public ObjectDrag objectDrag;
 
+    public InputManager inputManager;
+
     public Transform prefabTransform;
 
     public GameObject hand;
+
+    public Camera avatarCamera;
+
+    int layerSelectable;
 
     public float angleHorizontal;
     private float angleVertical;
@@ -27,7 +33,8 @@ public class Hand : NetworkBehaviour {
         //Cursor.lockState = CursorLockMode.Locked;
         angleHorizontal = 0f;
         angleVertical = 0f;
-        
+
+        layerSelectable = LayerMask.NameToLayer("selectionable");
 
     }
 
@@ -35,7 +42,7 @@ public class Hand : NetworkBehaviour {
     // Update is called once per frame
     void Update () {
         if (isLocalPlayer) {
-            if (objectDrag.controllerOn) {
+            if (inputManager.controllerOn) {
 
                 
                 Vector3 newpos = hand.transform.position;
@@ -52,6 +59,24 @@ public class Hand : NetworkBehaviour {
 
                 hand.transform.position = newpos;
                 syncPlayerTransform.UpdateHandPosition(hand.transform.position);
+
+                if (Input.GetButtonDown("Fire1")) {
+                    if (objectDrag.getIsDragFeatureOn()) {
+                        objectDrag.releaseObject();
+                    } else {
+                        Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(hand.transform.position));
+
+                        RaycastHit shootHit;
+
+                        // Whenever the rayCast hits something...
+                        if (Physics.Raycast(ray, out shootHit, 1000)) {
+                            // ... matching the layer
+                            if (shootHit.collider.gameObject.layer == layerSelectable) {
+                                objectDrag.selectObject(gameObject, shootHit.collider.gameObject,0f);
+                            }
+                        }
+                    }
+                }
 
 
             } else {
