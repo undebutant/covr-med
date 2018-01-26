@@ -43,7 +43,7 @@ public class ObjectDrag : MonoBehaviour {
         isDragFeatureOn = false;
 
     }
-    /
+    
     /// <summary>
     /// Public function to call when a device call for a drag
     /// </summary>
