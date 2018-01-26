@@ -4,7 +4,10 @@ using UnityEngine.Networking;
 
 
 public class InputManager : NetworkBehaviour {
-    public ObjectDrag objectDrag;
+    
+
+    [Tooltip("Indicates if the player is using a controller")]
+    public bool controllerOn;
 
     // Transform of the camera and Rigibody of the parent
     public Transform playerTransformCamera;
@@ -27,12 +30,12 @@ public class InputManager : NetworkBehaviour {
     float rotationY = 0F;
 
 
-	void Update () {
+    void Update () {
         if (isLocalPlayer) {
             float rotationX;
 
             // Handling inputs according to the boolean controllerOn
-            if (objectDrag.controllerOn) {
+            if (controllerOn) {
                 rotationX = playerTransformCamera.localEulerAngles.y + Input.GetAxis("Horizontal2") * sensitivityXAxis;
                 rotationY += -Input.GetAxis("Vertical2") * sensitivityYAxis;
                 rotationY = Mathf.Clamp(rotationY, minimumY, maximumY);
