@@ -5,10 +5,15 @@ using MiddleVR_Unity3D;
 
 public class WandSelection : MonoBehaviour {
 
+    [SerializeField]
+    private string selectableObjectsLayerName = "selectionable";
+
+    int selectableObjectsLayer;
+
 	// Use this for initialization
 	void Start () {
-		
-	}
+        selectableObjectsLayer =  LayerMask.NameToLayer(selectableObjectsLayerName);
+    }
 	
 	// Update is called once per frame
 	void Update () {
@@ -29,7 +34,10 @@ public class WandSelection : MonoBehaviour {
             }
 
             if (Physics.Raycast(transform.position, fwd, out hit)) {
-                print("There is something in front of the object!" + hit.collider.gameObject.name);
+                if(hit.collider.gameObject.layer == selectableObjectsLayer)
+                {
+                    Debug.Log("Hover the object : " + hit.collider.gameObject.name);
+                }
             }
         }
     }
