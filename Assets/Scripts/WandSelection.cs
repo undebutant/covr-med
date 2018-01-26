@@ -12,7 +12,6 @@ public class WandSelection : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-        Debug.Log("Position : " + transform.position);
         if (MiddleVR.VRDeviceMgr != null)
         {
             // Getting state of primary wand button
@@ -24,7 +23,7 @@ public class WandSelection : MonoBehaviour {
             if (wandButtonPressed0)
             {
                 // If primary button is pressed, display wand horizontal axis value
-                MVRTools.Log("WandButton 0 pressed! HAxis value: " + x + ", VAxis value: " + y + ".");
+                MVRTools.Log("WandButton 0 pressed!");
             }
         }
     }
