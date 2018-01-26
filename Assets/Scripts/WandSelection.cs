@@ -37,6 +37,12 @@ public class WandSelection : MonoBehaviour {
                 if(hit.collider.gameObject.layer == selectableObjectsLayer)
                 {
                     Debug.Log("Hover the object : " + hit.collider.gameObject.name);
+                    GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
+                    if (wandButtonPressed0) {
+                        // If primary button is pressed, display wand horizontal axis value
+                        MVRTools.Log("WandButton 0 pressed!");
+                        // Here, call the drag and drop
+                    }
                 }
             }
         }
