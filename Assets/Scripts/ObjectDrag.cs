@@ -22,6 +22,7 @@ public class ObjectDrag : MonoBehaviour {
     bool isDragFeatureOn;
     GameObject deviceSelector;
     GameObject objectSelected;
+    // The distance between the device and the object
     float distance;
 
 
@@ -42,21 +43,26 @@ public class ObjectDrag : MonoBehaviour {
         isDragFeatureOn = false;
 
     }
-
+    /
+    /// <summary>
+    /// Public function to call when a device call for a drag
+    /// </summary>
+    /// <param name="newdeviceSelector">The Device GameObject</param>
+    /// <param name="newobjectSelected">The GameObject to move</param>
+    /// <param name="newdistance">The distance to keep between the device and object</param>
     public void selectObject(GameObject newdeviceSelector, GameObject newobjectSelected, float newdistance) {
         if(newdeviceSelector != null && newobjectSelected != null) {
             deviceSelector = newdeviceSelector;
             objectSelected = newobjectSelected;
             distance = newdistance;
             isDragFeatureOn = true;
-            Debug.LogError("ON");
         } else {
             isDragFeatureOn = false;
             throw new Exception("BAD device Selector or BAD object to select");
         }
         
     }
-
+    //The function called each frame to move the object
     void moveObject() {
         if (isDragFeatureOn) {
 
@@ -69,14 +75,16 @@ public class ObjectDrag : MonoBehaviour {
             // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
             playerMoveObject.moveObject(objectSelected, newPos, newRot);
 
-            /*
+            
             // Checking whether or not the object is close enough to highlight the snap zone
             float distance = Vector3.Distance(zonePosition, objectSelected.transform.position);
-            zone.GetComponent<Renderer>().material.color = (distance < closeDistance) ? closeColor : normalColor;*/
+            zone.GetComponent<Renderer>().material.color = (distance < closeDistance) ? closeColor : normalColor;
         }
     }
 
-
+    /// <summary>
+    /// Public function to call to release the object selected
+    /// </summary>
     public void releaseObject() {
         if (isDragFeatureOn) {
 
@@ -104,7 +112,6 @@ public class ObjectDrag : MonoBehaviour {
         deviceSelector = null;
         objectSelected = null;
         isDragFeatureOn = false;
-        Debug.LogError("OFF");
     }
 
 

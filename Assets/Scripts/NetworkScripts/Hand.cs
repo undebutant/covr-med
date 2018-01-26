@@ -64,6 +64,7 @@ public class Hand : NetworkBehaviour {
                     if (objectDrag.getIsDragFeatureOn()) {
                         objectDrag.releaseObject();
                     } else {
+                        //Raycast for the controller only
                         Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(hand.transform.position));
 
                         RaycastHit shootHit;
@@ -72,7 +73,7 @@ public class Hand : NetworkBehaviour {
                         if (Physics.Raycast(ray, out shootHit, 1000)) {
                             // ... matching the layer
                             if (shootHit.collider.gameObject.layer == layerSelectable) {
-                                objectDrag.selectObject(gameObject, shootHit.collider.gameObject,0f);
+                                objectDrag.selectObject(hand, shootHit.collider.gameObject,0f);
                             }
                         }
                     }
