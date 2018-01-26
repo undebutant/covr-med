@@ -15,16 +15,13 @@ public class ObjectDrag : MonoBehaviour {
     [Tooltip("The network script attached in order to synchronise the drag and drop online")]
     PlayerMoveObject playerMoveObject;
 
-  
-
-
     // Movement variables
     bool isDragFeatureOn;
     GameObject deviceSelector;
     GameObject objectSelected;
-    // The distance between the device and the object
-    float distance;
 
+    // The distance between the device and the selected object
+    float distance;
 
     // Snap variables
     GameObject zone;                                // The area to touch with the object for the snap feature
@@ -32,40 +29,45 @@ public class ObjectDrag : MonoBehaviour {
     Color closeColor = new Color(0, 1, 0);          // The color of the area whenever a dragged object is nearby
     private Color normalColor = new Color();
 
-    public bool getIsDragFeatureOn () {
+
+    public bool GetIsDragFeatureOn () {
         return isDragFeatureOn;
     }
+
 
     void Start () {
         // Finding the snap area and storing it
         zone = GameObject.FindGameObjectWithTag("Zone");
         normalColor = zone.GetComponent<Renderer>().material.color;
-        isDragFeatureOn = false;
 
+        isDragFeatureOn = false;
     }
     
+
     /// <summary>
-    /// Public function to call when a device call for a drag
+    ///     Public function called by a device to start dragging an object
     /// </summary>
     /// <param name="newdeviceSelector">The Device GameObject</param>
     /// <param name="newobjectSelected">The GameObject to move</param>
-    /// <param name="newdistance">The distance to keep between the device and object</param>
-    public void selectObject(GameObject newdeviceSelector, GameObject newobjectSelected, float newdistance) {
+    /// <param name="newdistance">The distance to keep between the device and the object</param>
+    public void SelectObject(GameObject newdeviceSelector, GameObject newobjectSelected, float newdistance) {
         if(newdeviceSelector != null && newobjectSelected != null) {
             deviceSelector = newdeviceSelector;
             objectSelected = newobjectSelected;
             distance = newdistance;
+
             isDragFeatureOn = true;
         } else {
             isDragFeatureOn = false;
-            throw new Exception("BAD device Selector or BAD object to select");
-        }
-        
-    }
-    //The function called each frame to move the object
-    void moveObject() {
-        if (isDragFeatureOn) {
 
+            throw new Exception("Bas device Selector or bad object to select");
+        }
+    }
+
+
+    // The function called each frame to move the object
+    void MoveObject() {
+        if (isDragFeatureOn) {
             Vector3 newPos = deviceSelector.transform.position;
             Quaternion newRot = deviceSelector.transform.rotation;
 
@@ -74,7 +76,6 @@ public class ObjectDrag : MonoBehaviour {
             // Calling the synchronise online method to propagate the movement
             // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
             playerMoveObject.moveObject(objectSelected, newPos, newRot);
-
             
             // Checking whether or not the object is close enough to highlight the snap zone
             float distance = Vector3.Distance(zonePosition, objectSelected.transform.position);
@@ -82,16 +83,17 @@ public class ObjectDrag : MonoBehaviour {
         }
     }
 
+
     /// <summary>
     /// Public function to call to release the object selected
     /// </summary>
-    public void releaseObject() {
+    public void ReleaseObject() {
         if (isDragFeatureOn) {
-
             Vector3 zonePosition = zone.transform.position;
 
             // Checking whether or not the object is close enough to snap the object
             float distance = Vector3.Distance(zonePosition, objectSelected.transform.position);
+
             if (distance < closeDistance) {
                 Vector3 newPos = zone.transform.position;
 
@@ -111,12 +113,13 @@ public class ObjectDrag : MonoBehaviour {
         }
         deviceSelector = null;
         objectSelected = null;
+
         isDragFeatureOn = false;
     }
 
 
 
 	void Update () {
-        moveObject();
+        MoveObject();
     } 
 }

@@ -5,46 +5,53 @@ using UnityEngine.Networking;
 
 public class Hand : NetworkBehaviour {
 
-    public SyncPlayerTransform syncPlayerTransform;
+    [SerializeField]
+    [Tooltip("The network script for online synchronisation of the player")]
+    SyncPlayerTransform syncPlayerTransform;
 
-    public ObjectDrag objectDrag;
+    [SerializeField]
+    [Tooltip("The drag and drop script coming from the hand")]
+    ObjectDrag objectDrag;
 
-    public InputManager inputManager;
+    [SerializeField]
+    [Tooltip("The input manager of the player")]
+    InputManager inputManager;
 
-    public Transform prefabTransform;
+    [SerializeField]
+    [Tooltip("The transform of the parent avatar")]
+    Transform prefabTransform;
 
-    public GameObject hand;
+    [SerializeField]
+    [Tooltip("The hand GameObject of this avatar")]
+    GameObject hand;
 
-    public Camera avatarCamera;
+    [SerializeField]
+    Camera avatarCamera;
 
+    // The int value of the layer mask "selectionable"
     int layerSelectable;
 
-    public float angleHorizontal;
-    private float angleVertical;
+    // The angles for spherical rotation of the hand around the player, using controller
+    float angleHorizontal;
+    float angleVertical;
 
-    
-    Vector3 offset;
-   
-    public float speed;
+    [SerializeField]
+    [Tooltip("The sensitivity of the controller")]
+    float speed;
 
-    // Use this for initialization
+
     void Start () {
-        
-        //Cursor.lockState = CursorLockMode.Locked;
         angleHorizontal = 0f;
         angleVertical = 0f;
 
         layerSelectable = LayerMask.NameToLayer("selectionable");
-
     }
 
 
-    // Update is called once per frame
     void Update () {
         if (isLocalPlayer) {
+            // Using controller
             if (inputManager.controllerOn) {
-
-                
                 Vector3 newpos = hand.transform.position;
                 
                 angleHorizontal = angleHorizontal + Input.GetAxis("HorizontalDpad") * Time.deltaTime * speed;
@@ -61,10 +68,10 @@ public class Hand : NetworkBehaviour {
                 syncPlayerTransform.UpdateHandPosition(hand.transform.position);
 
                 if (Input.GetButtonDown("Fire1")) {
-                    if (objectDrag.getIsDragFeatureOn()) {
-                        objectDrag.releaseObject();
+                    if (objectDrag.GetIsDragFeatureOn()) {
+                        objectDrag.ReleaseObject();
                     } else {
-                        //Raycast for the controller only
+                        // Raycast for the controller only
                         Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(hand.transform.position));
 
                         RaycastHit shootHit;
@@ -73,7 +80,7 @@ public class Hand : NetworkBehaviour {
                         if (Physics.Raycast(ray, out shootHit, 1000)) {
                             // ... matching the layer
                             if (shootHit.collider.gameObject.layer == layerSelectable) {
-                                objectDrag.selectObject(hand, shootHit.collider.gameObject,0f);
+                                objectDrag.SelectObject(hand, shootHit.collider.gameObject,0f);
                             }
                         }
                     }
@@ -92,11 +99,7 @@ public class Hand : NetworkBehaviour {
                 */
             }
         } else {
-
             hand.transform.position = syncPlayerTransform.getHandPosition();
         }
-        
-        
-
     }
 }
