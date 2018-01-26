@@ -12,6 +12,8 @@ public class WandSelection : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
+        Vector3 fwd = transform.TransformDirection(Vector3.forward);
+        RaycastHit hit;
         if (MiddleVR.VRDeviceMgr != null)
         {
             // Getting state of primary wand button
@@ -24,6 +26,10 @@ public class WandSelection : MonoBehaviour {
             {
                 // If primary button is pressed, display wand horizontal axis value
                 MVRTools.Log("WandButton 0 pressed!");
+            }
+
+            if (Physics.Raycast(transform.position, fwd, out hit)) {
+                print("There is something in front of the object!" + hit.collider.gameObject.name);
             }
         }
     }
