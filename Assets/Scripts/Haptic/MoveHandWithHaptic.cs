@@ -19,6 +19,7 @@ public class MoveHandWithHaptic : MonoBehaviour {
 
 
 	void Update () {
+      
         // Move the GameObject according to the haptic arm
         transform.position = hapticManager.HandPosition;
         // Rotate the GameObject according to the haptic arm

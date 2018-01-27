@@ -29,6 +29,9 @@ public class InputManager : NetworkBehaviour {
     // Current Y rotation of the camera
     float rotationY = 0F;
 
+    
+   
+
 
     void Update () {
         if (isLocalPlayer) {

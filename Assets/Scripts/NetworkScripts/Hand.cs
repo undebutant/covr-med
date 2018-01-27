@@ -39,12 +39,15 @@ public class Hand : NetworkBehaviour {
     [Tooltip("The sensitivity of the controller")]
     float speed;
 
+    //Haptic manager
+    public HapticManager hapticManager;
 
     void Start () {
         angleHorizontal = 0f;
         angleVertical = 0f;
 
         layerSelectable = LayerMask.NameToLayer("selectionable");
+        
     }
 
 
@@ -88,15 +91,15 @@ public class Hand : NetworkBehaviour {
 
 
             } else {
-                //TODO Souris abandonné place à l'haptic
-                /*
-                cursorPosition = Input.mousePosition;
-                cursorPosition.z = 0.666f;
-                //offset = hand.transform.position - avatarCamera.ScreenToWorldPoint(cursorPosition);
-                hand.transform.position = avatarCamera.ScreenToWorldPoint(cursorPosition);
+    
+                // Move the GameObject according to the haptic arm
+                hand.transform.localPosition = hapticManager.HandPosition;
+                // Rotate the GameObject according to the haptic arm
+                hand.transform.localRotation = hapticManager.HandRotation;
 
                 syncPlayerTransform.UpdateHandPosition(hand.transform.position);
-                */
+
+
             }
         } else {
             hand.transform.position = syncPlayerTransform.getHandPosition();
