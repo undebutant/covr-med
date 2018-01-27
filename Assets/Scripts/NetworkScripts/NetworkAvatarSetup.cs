@@ -17,6 +17,15 @@ public class NetworkAvatarSetup : NetworkBehaviour {
     // The nurse spawner that we need to enable once the first player is connected
     private GameObject nurseSpawner;
 
+    /// <summary>
+    ///     The ConfigInitializer component containing all the global setup variables
+    /// </summary>
+    ConfigInitializer configInitializer;
+
+    /// <summary>
+    ///     The player's role, read on the configuration file by the ConfigInitialization script
+    /// </summary>
+    PlayerRole playerRole;
 
     [SerializeField]
     [Tooltip("The camera of the player avatar prefab, to set active on creation of the avatar")]
@@ -39,6 +48,8 @@ public class NetworkAvatarSetup : NetworkBehaviour {
 
         surgeonSpawner = GameObject.FindGameObjectWithTag("SurgeonSpawner");
         nurseSpawner = GameObject.FindGameObjectWithTag("NurseSpawner");
+        configInitializer = FindObjectOfType<ConfigInitializer>();
+        playerRole = configInitializer.GetPlayerRole();
 
         if (isLocalPlayer) {
             // Enabling the avatar's camera
@@ -53,47 +64,47 @@ public class NetworkAvatarSetup : NetworkBehaviour {
             // Disabling the player's avatar
             playerAvatar.SetActive(false);
 
+            if (isLocalPlayer) {
+                if (playerRole == PlayerRole.Surgeon) {
+                    // Positionning the surgeon
+                    this.transform.position = surgeonSpawner.transform.position;
+                    this.transform.rotation = surgeonSpawner.transform.rotation;
 
-            if (isServer && isLocalPlayer) {
-                // Positionning the surgeon
-                this.transform.position = surgeonSpawner.transform.position;
-                this.transform.rotation = surgeonSpawner.transform.rotation;
+                    // Playing the sit animation for the surgeon avatar
+                    playerAvatar.GetComponent<Animation>().Play("M_Sit_Idle_2");
+                } else {
+                    // Positionning the nurse
+                    this.transform.position = nurseSpawner.transform.position;
+                    this.transform.rotation = nurseSpawner.transform.rotation;
+                }
+            } else {
+                if (playerRole == PlayerRole.Surgeon)
+                {
+                    // Positionning the nurse
+                    this.transform.position = nurseSpawner.transform.position;
+                    this.transform.rotation = nurseSpawner.transform.rotation;
+                } else {
+                    // Positionning the surgeon
+                    this.transform.position = surgeonSpawner.transform.position;
+                    this.transform.rotation = surgeonSpawner.transform.rotation;
 
-                // Playing the sit animation for the surgeon avatar
-                playerAvatar.GetComponent<Animation>().Play("M_Sit_Idle_2");
+                    // Playing the sit animation for the surgeon avatar
+                    playerAvatar.GetComponent<Animation>().Play("M_Sit_Idle_2");
+                }
             }
-            else if (!isServer && !isLocalPlayer) {
-                // Positionning the surgeon
-                this.transform.position = surgeonSpawner.transform.position;
-                this.transform.rotation = surgeonSpawner.transform.rotation;
 
-                // Playing the sit animation for the surgeon avatar
-                playerAvatar.GetComponent<Animation>().Play("M_Sit_Idle_2");
-            }
-            else if (isServer && !isLocalPlayer) {
-                // Positionning the nurse
-                this.transform.position = nurseSpawner.transform.position;
-                this.transform.rotation = nurseSpawner.transform.rotation;
-            }
-            else if (!isServer && isLocalPlayer) {
-                // Positionning the nurse
-                this.transform.position = nurseSpawner.transform.position;
-                this.transform.rotation = nurseSpawner.transform.rotation;
-            }
-
-
-            // Disabling the global camera of the scene
+        // Disabling the global camera of the scene
             GameObject.FindWithTag("SceneCamera").SetActive(false);
         }
     }
 
 
     private void Update() {
-        if (isServer && isLocalPlayer) {
+        if (isLocalPlayer && playerRole == PlayerRole.Surgeon) {
             // Playing the sit animation for the surgeon avatar
             playerAvatar.GetComponent<Animation>().PlayQueued("M_Sit_Idle_2");
         }
-        else if (!isServer && !isLocalPlayer) {
+        else if (!isLocalPlayer && playerRole != PlayerRole.Surgeon) {
             // Playing the sit animation for the surgeon avatar
             playerAvatar.GetComponent<Animation>().PlayQueued("M_Sit_Idle_2");
         }
