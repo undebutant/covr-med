@@ -20,6 +20,9 @@ public class MainMenuManager : MonoBehaviour {
     [SerializeField]
     Text hostPortText;
 
+    [SerializeField]
+    ConnectionManager connectionManager;
+
     // ========== Set the texts displayed on the main menu ============
 
     /// <summary>
@@ -71,5 +74,20 @@ public class MainMenuManager : MonoBehaviour {
         SetInputDeviceButtonDisplay(configInitializer.GetInputDevice().ToString());
         SetHostIPDisplay(configInitializer.GetServerIP());
         SetHostPortDisplay(configInitializer.GetConnectionPort().ToString());
+    }
+
+
+    public void OnHitButton(GameObject buttonHit) {
+        switch (buttonHit.name) {
+            case "HostButton":
+                connectionManager.StartAsHost();
+                break;
+            case "ClientHost":
+                connectionManager.StartAsClient();
+                break;
+            default:
+                Debug.LogError("Reaching unexpected button name in the MainMenuManager");
+                break;
+        }
     }
 }

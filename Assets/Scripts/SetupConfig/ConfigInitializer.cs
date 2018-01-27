@@ -19,10 +19,10 @@ public class ConfigInitializer : MonoBehaviour {
 
     [SerializeField]
     [Tooltip("The name of the JSON configuration file")]
-    string nameOfJSON;
+    string nameOfJSON = "config.json";
 
     [SerializeField]
-    [Tooltip("Main name of the main menu's scene")]
+    [Tooltip("Name of the main menu's scene")]
     string mainMenuScene;
 
 
@@ -64,6 +64,8 @@ public class ConfigInitializer : MonoBehaviour {
 
             // Creating a sample JSON file
             CreateBasicJSON(nameOfJSON, true);
+
+            SceneManager.LoadScene(mainMenuScene);
         }
     }
 
