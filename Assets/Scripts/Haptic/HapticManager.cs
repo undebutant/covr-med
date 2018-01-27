@@ -122,6 +122,8 @@ public class HapticManager : MonoBehaviour {
     // Responsable of all the haptic force feedback during simulation
     private bool PhantomUpdate()
     {
+        
+        //The changes are made because unity has a base with xzy axes and the haptic has a base with zxy
 
         Vector3 haptPosition = Phantom.GetPosition() / downScale;
         //adapting haptic axes to unity axes 
