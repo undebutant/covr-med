@@ -93,28 +93,28 @@ public class ConfigInitializer : MonoBehaviour {
     //              Getter and setters for the setup variables              //
     //////////////////////////////////////////////////////////////////////////
 
-    string GetServerIP() {
+    public string GetServerIP() {
         return startingConfig.serverIP;
     }
 
-    int GetConnectionPort() {
+    public int GetConnectionPort() {
         return startingConfig.connectionPort;
     }
 
-    DisplayDevice GetDisplayDevice() {
+    public DisplayDevice GetDisplayDevice() {
         return startingConfig.displayDevice;
     }
 
-    InputDevice GetInputDevice() {
+    public InputDevice GetInputDevice() {
         return startingConfig.inputDevice;
     }
 
-    PlayerRole GetPlayerRole() {
+    public PlayerRole GetPlayerRole() {
         return startingConfig.playerRole;
     }
 
 
-    void SetInputDevice (InputDevice newInputDevice) {
+    public void SetInputDevice (InputDevice newInputDevice) {
         startingConfig.inputDevice = newInputDevice;
         CreateBasicJSON(nameOfJSON, false);
     }
