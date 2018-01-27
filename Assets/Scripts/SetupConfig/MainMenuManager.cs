@@ -1,8 +1,24 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class MainMenuManager : MonoBehaviour {
+
+    [SerializeField]
+    Text roleButtonText;
+
+    [SerializeField]
+    Text displayDeviceButtonText;
+
+    [SerializeField]
+    Text inputDeviceButtonText;
+
+    [SerializeField]
+    Text hostIpButtonText;
+
+    [SerializeField]
+    Text hostPortText;
 
     // ========== Set the texts displayed on the main menu ============
 
@@ -11,15 +27,15 @@ public class MainMenuManager : MonoBehaviour {
     /// </summary>
     /// <param name="role">Role to display</param>
     public void SetRoleButtonDisplay(string role) {
-        //TODO
+        roleButtonText.text = role;
     }
 
     /// <summary>
     ///     Sets the 'display device' displayed on the button
     /// </summary>
-    /// <param name="role">Display device's name to display on the button in the menu</param>
-    public void SetDisplayDeviceButtonDisplay(string role) {
-
+    /// <param name="displayDevice">Display device's name to display on the button in the menu</param>
+    public void SetDisplayDeviceButtonDisplay(string displayDevice) {
+        displayDeviceButtonText.text = displayDevice;
     }
 
     /// <summary>
@@ -27,7 +43,7 @@ public class MainMenuManager : MonoBehaviour {
     /// </summary>
     /// <param name="inputDevice">Input device to display</param>
     public void SetInputDeviceButtonDisplay(string inputDevice) {
-
+        inputDeviceButtonText.text = inputDevice;
     }
 
     /// <summary>
@@ -35,7 +51,7 @@ public class MainMenuManager : MonoBehaviour {
     /// </summary>
     /// <param name="hostIp">Host server IP to display on the button in the main menu</param>
     public void SetHostIPDisplay(string hostIp) {
-
+        hostIpButtonText.text = hostIp;
     }
 
     /// <summary>
@@ -43,6 +59,6 @@ public class MainMenuManager : MonoBehaviour {
     /// </summary>
     /// <param name="hostPort">host servers's port to display on the button in the main menu</param>
     public void SetHostPortDisplay(string hostPort) {
-
+        hostPortText.text = hostPort;
     }
 }
