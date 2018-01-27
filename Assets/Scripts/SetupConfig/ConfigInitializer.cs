@@ -57,7 +57,7 @@ public class ConfigInitializer : MonoBehaviour {
             Debug.LogError("File not found (was looking at " + Path.GetFullPath(".") + "\\" + nameOfJSON + ")");
 
             // Creating a sample JSON file
-            CreateBasicJSON(nameOfJSON);
+            CreateBasicJSON(nameOfJSON, true);
         }
     }
 
@@ -66,14 +66,17 @@ public class ConfigInitializer : MonoBehaviour {
     ///     Setting up a basic JSON file as sample
     /// </summary>
     /// <param name="storingPath">The path in which we want the JSON to be saved</param>
-    void CreateBasicJSON(string storingPath) {
-        startingConfig.serverIP = "localhost";
-        startingConfig.connectionPort = 7777;
+    /// <param name="isSampleConfigUsed">Choosing if value inside the startingConfig object should be overriden as sample or not</param>
+    void CreateBasicJSON(string storingPath, bool isSampleConfigUsed) {
+        if (isSampleConfigUsed) {
+            startingConfig.serverIP = "localhost";
+            startingConfig.connectionPort = 7777;
 
-        startingConfig.displayDevice = DisplayDevice.Cave;
-        startingConfig.inputDevice = InputDevice.Controller;
+            startingConfig.displayDevice = DisplayDevice.Cave;
+            startingConfig.inputDevice = InputDevice.Controller;
 
-        startingConfig.playerRole = PlayerRole.Nurse;
+            startingConfig.playerRole = PlayerRole.Nurse;
+        }
 
         // Saving the sample JSON
         File.WriteAllText(nameOfJSON, JsonUtility.ToJson(startingConfig));
@@ -107,5 +110,6 @@ public class ConfigInitializer : MonoBehaviour {
 
     void SetInputDevice (InputDevice newInputDevice) {
         startingConfig.inputDevice = newInputDevice;
+        CreateBasicJSON(nameOfJSON, false);
     }
 }
