@@ -1,4 +1,5 @@
 ﻿using UnityEngine;
+using UnityEngine.SceneManagement;
 using System;
 using System.IO;
 
@@ -19,6 +20,10 @@ public class ConfigInitializer : MonoBehaviour {
     [SerializeField]
     [Tooltip("The name of the JSON configuration file")]
     string nameOfJSON;
+
+    [SerializeField]
+    [Tooltip("Main name of the main menu's scene")]
+    string mainMenuScene;
 
 
     /// <summary>
@@ -43,6 +48,7 @@ public class ConfigInitializer : MonoBehaviour {
         if(File.Exists(nameOfJSON)) {
             try {
                 startingConfig = JsonUtility.FromJson<StartingConfig>(File.ReadAllText(nameOfJSON));
+                SceneManager.LoadScene(mainMenuScene);
             }
             // Catching error while parsing
             catch (ArgumentException exception) {
