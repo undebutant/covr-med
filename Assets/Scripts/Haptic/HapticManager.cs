@@ -28,8 +28,6 @@ public class HapticManager : MonoBehaviour {
     [SerializeField]
     GameObject hand;
 
-    [SerializeField]
-    GameObject player;
 
     //Variaple to reduce plage of Haptic movement
     [SerializeField]
@@ -98,6 +96,7 @@ public class HapticManager : MonoBehaviour {
 
         return true;
     }
+
 
     // Use this for initialization
     void Start () {
