@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using ManagedPhantom;
 
 public class Hand : NetworkBehaviour {
 
@@ -28,6 +29,8 @@ public class Hand : NetworkBehaviour {
     [SerializeField]
     Camera avatarCamera;
 
+    GameObject objectToSelect;
+
     // The int value of the layer mask "selectionable"
     int layerSelectable;
 
@@ -42,17 +45,28 @@ public class Hand : NetworkBehaviour {
     //Haptic manager
     public HapticManager hapticManager;
 
+
+    public GameObject ObjectToSelect { 
+
+        set {
+           objectToSelect = value;
+        }
+
+    }
+
     void Start () {
         angleHorizontal = 0f;
         angleVertical = 0f;
-
+        objectToSelect = null;
         layerSelectable = LayerMask.NameToLayer("selectionable");
         
     }
 
 
     void Update () {
+
         if (isLocalPlayer) {
+
             // Using controller
             if (inputManager.controllerOn) {
                 Vector3 newpos = hand.transform.position;
@@ -88,20 +102,45 @@ public class Hand : NetworkBehaviour {
                         }
                     }
                 }
+                
+            }
 
-
-            } else {
+            else {
     
                 // Move the GameObject according to the haptic arm
                 hand.transform.localPosition = hapticManager.HandPosition;
+
                 // Rotate the GameObject according to the haptic arm
                 hand.transform.localRotation = hapticManager.HandRotation;
 
                 syncPlayerTransform.UpdateHandPosition(hand.transform.position);
+                //Test if the button one of the haptic controller is pressed
 
+                if (hapticManager.GetButtonDown(1))
+                {
+                    //If an object is currently beeing draged ...
+                    if (objectDrag.GetIsDragFeatureOn())
+                    {
+                        //... release the object
+                        objectDrag.ReleaseObject();
+                    }
 
+                    else
+                    {
+                        //If an object can be selected ...
+                        if (objectToSelect != null) { 
+
+                            // ... start dragging the object
+                            objectDrag.SelectObject(hand, objectToSelect, 0f);
+
+                        }
+
+                    }
+                }
+                
             }
-        } else {
+        }
+        else {
             hand.transform.position = syncPlayerTransform.getHandPosition();
         }
     }
