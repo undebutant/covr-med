@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
+using ManagedPhantom;
+
 
 public class Hand : NetworkBehaviour {
 
@@ -26,7 +28,13 @@ public class Hand : NetworkBehaviour {
     GameObject hand;
 
     [SerializeField]
+    [Tooltip("The hand GameObject of this avatar")]
+    GameObject handMesh;
+
+    [SerializeField]
     Camera avatarCamera;
+
+    GameObject objectToSelect;
 
     // The int value of the layer mask "selectionable"
     int layerSelectable;
@@ -39,11 +47,17 @@ public class Hand : NetworkBehaviour {
     [Tooltip("The sensitivity of the controller")]
     float speed;
 
-    //Haptic manager
+    // Haptic manager
     public HapticManager hapticManager;
 
     // The config for the local instance
     ConfigInitializer config;
+
+    public GameObject ObjectToSelect {
+        set {
+            objectToSelect = value;
+        }
+    }
 
 
     /// <summary>
@@ -56,10 +70,11 @@ public class Hand : NetworkBehaviour {
         syncPlayerTransform.UpdateHandPosition(hand.transform.position);
     }
 
-
     void Start() {
         horizontalAngle = 0f;
         verticalAngle = 0f;
+
+        objectToSelect = null;
 
         layerSelectable = LayerMask.NameToLayer("selectionable");
 
@@ -105,17 +120,44 @@ public class Hand : NetworkBehaviour {
                             }
                         }
                     }
-                // Using haptic arm
+                    // Using haptic arm
                 } else {
                     // Move the GameObject according to the haptic arm
                     hand.transform.localPosition = hapticManager.HandPosition;
+
                     // Rotate the GameObject according to the haptic arm
                     hand.transform.localRotation = hapticManager.HandRotation;
 
+                    // Sending it through the network
                     syncPlayerTransform.UpdateHandPosition(hand.transform.position);
+
+                    // Test if the button1 of the haptic controller is 
+                    if (hapticManager.GetButtonDown(1)) {
+                        // If an object is currently beeing draged ...
+                        if (objectDrag.GetIsDragFeatureOn()) {
+                            //... release the object
+                            objectDrag.ReleaseObject();
+                            // Reactivate the hand and tell the haptic manager that a syringe is not selected
+                            hapticManager.ReleaseSyringe();
+                            handMesh.SetActive(true);
+
+                            //If an object can be selected ...
+                        } else {
+                            if (objectToSelect != null) {
+                                // ... start dragging the object
+                                objectDrag.SelectObject(hand, objectToSelect, 0f);
+
+                                // When the object selected is a syringe, make the hand disappear and tell the haptic manager that a syringe is selected
+                                if (objectToSelect.CompareTag("Seringe")) {
+                                    hapticManager.SelectSyringe();
+                                    handMesh.SetActive(false);
+                                }
+                            }
+                        }
+                    }
                 }
             }
-        // If it is not a local player, only update the hand
+        // The player is not local, hence we just apply the updated position of the other avatar's hand ingame
         } else {
             hand.transform.position = syncPlayerTransform.getHandPosition();
         }
