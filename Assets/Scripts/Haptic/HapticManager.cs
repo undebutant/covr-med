@@ -3,71 +3,88 @@ using System.Collections.Generic;
 using UnityEngine;
 using ManagedPhantom;
 
-//---------------------------------------------------------------------------
-// HAPTIC MANAGER
-//---------------------------------------------------------------------------
 
-
+/// <summary>
+///     The input manager dedicated for the haptic arm
+/// </summary>
 public class HapticManager : MonoBehaviour {
 
-    //declarations
+    // Variables declarations
 
     /// Tag for logging information (Debug purpose only)
     private static string _tag = ".::. HapticManager .::. ";
 
-    private SimplePhantomUnity Phantom = null;
+    private SimplePhantomUnity phantom = null;
 
     Vector3 handPosition;
     Quaternion handRotation;
 
     
-    Vector3 offset;
-
+    Vector3 offsetPosition;
     Quaternion offsetRotation;
 
     [SerializeField]
     GameObject hand;
 
 
-    //Variaple to reduce plage of Haptic movement
+    //Boolean and state to recreate the GetButtonDown from the haptic
+
+    bool waitForButton1ToBePressed;
+    bool waitForButton2ToBePressed;
+    bool isButton1Pressed;
+    bool isButton2Pressed;
+
+    // Variable to reduce range of Haptic movement in Unity scale
     [SerializeField]
     int downScale = 150;
 
-    public  Vector3 HandPosition
-    {
+    // Variable to deactivate some rotations from the hand so that the syringe follow the haptic arm correctly
+    bool isSyringeSelected = false;
+
+    public void SelectSyringe() {
+        isSyringeSelected = true;
+    }
+
+    public void ReleaseSyringe() {
+        isSyringeSelected = false;
+    }
+
+    public SimplePhantomUnity Phantom {
         get
         {
+            return phantom;
+        }
+    }
+
+    public  Vector3 HandPosition {
+        get {
             return handPosition;
         }
     }
 
 
-    public Quaternion HandRotation
-    {
-        get
-        {
+    public Quaternion HandRotation {
+        get {
             return handRotation;
         }
     }
 
 
-    // Initializes communication with Phantom device
-    public bool InitHaptics()
-    {
-        // Initializes variables
+    // Initialize communication with Phantom device
+    public bool InitHaptics() {
+        // Initialize variables
         Init();
 
-        Phantom = new SimplePhantomUnity();    
-        Phantom.AddSchedule(PhantomUpdate,Hd.Priority.HD_RENDER_EFFECT_FORCE_PRIORITY);
-        Phantom.Start();
+        phantom = new SimplePhantomUnity();    
+        phantom.AddSchedule(PhantomUpdate, Hd.Priority.HD_RENDER_EFFECT_FORCE_PRIORITY);
+        phantom.Start();
 
         return true;
     }
 
 
     // Initialization of the manager
-    private void Init()
-    {
+    private void Init() {
         // Initialization of hand position and orientation
         handPosition = Vector3.zero;
         handRotation = Quaternion.identity;
@@ -75,74 +92,126 @@ public class HapticManager : MonoBehaviour {
 
 
     // Process when disabling the application
-    private void OnDisable()
-    {
+    private void OnDisable() {
         Debug.Log(_tag + "Haptic go out on disable");
         StopHaptics();
     }
 
 
-    // Stops device communication
-    public bool StopHaptics()
-    {
-        if (Phantom == null || !Phantom.IsRunning)
+    // Stop device communication
+    public bool StopHaptics() {
+        if (phantom == null || !phantom.IsRunning)
             return false;
 
-        while (!Phantom.IsAvailable) Debug.Log(_tag + "...");
+        while (phantom.IsAvailable);
 
         // Exit the use of PHANTOM
-        Phantom.Close();
-        Phantom = null;
+        phantom.Close();
+        phantom = null;
 
         return true;
     }
 
 
-    // Use this for initialization
     void Start () {
-        offset = hand.transform.localPosition;
+        offsetPosition = hand.transform.localPosition;
         offsetRotation = hand.transform.localRotation;
-        Debug.LogError(offsetRotation);
       
         InitHaptics();
 
-    }
-
-
-    // Update is called once per frame
-    void Update()
-    {
-        if (Phantom != null) 
-        Debug.Log(handPosition);
-
+        isButton1Pressed = false;
+        isButton2Pressed = false;
+        waitForButton1ToBePressed = true;
+        waitForButton2ToBePressed = true;
+        isSyringeSelected = false;
     }
 
 
     // Function to be executed asynchronously from the haptic device
-    // Responsable of all the haptic force feedback during simulation
-    private bool PhantomUpdate()
-    {
-        
-        //The changes are made because unity has a base with xzy axes and the haptic has a base with zxy
+    private bool PhantomUpdate() {
+        // Downscaling the movement range in Unity app for the user
+        Vector3 haptPosition = phantom.GetPosition() / downScale;
 
-        Vector3 haptPosition = Phantom.GetPosition() / downScale;
-        //adapting haptic axes to unity axes 
+
+        // Axes are swapped because unity has a xzy reference frame and the haptic has a zxy reference frame
         handPosition.x = - haptPosition.z;
         handPosition.z = haptPosition.x;
         handPosition.y = haptPosition.y;
-        handPosition = handPosition + offset;
+        handPosition = handPosition + offsetPosition;
 
-        Quaternion haptRotation = Phantom.GetRotation();
-        //get euler vector from quaternion to be aple to apply changes
+
+        Quaternion haptRotation = phantom.GetRotation();
+
+        // Converting from quaternion to euler for axes swapping
         Vector3 eulerVector = haptRotation.eulerAngles;
 
+        // Going from Phantom to Unity axes
         float temp = eulerVector.x;
         eulerVector.x = -eulerVector.z;
         eulerVector.z = temp;
 
+        // Going back to quaternion
         haptRotation = Quaternion.Euler(eulerVector.x, eulerVector.y, eulerVector.z);
-        handRotation = haptRotation * offsetRotation;
+
+
+        // Deactivate some rotations from the hand to have the syringe follow the haptique correctly
+        if (isSyringeSelected) {
+            handRotation = haptRotation;
+        } else {
+            handRotation = haptRotation * offsetRotation;
+        }
+        
+
+
+
+        // Test if the button 1 and 2 are pressed
+        // If so, toggle on/off the boolean isButtonPressed
+        if (phantom.GetButton() == Buttons.Button1 && waitForButton1ToBePressed) {
+            waitForButton1ToBePressed = false;
+            isButton1Pressed = true;
+        }
+
+        if (phantom.GetButton() != Buttons.Button1 && !waitForButton1ToBePressed) {
+            waitForButton1ToBePressed = true;
+            isButton1Pressed = false;
+        }
+
+        if (phantom.GetButton() == Buttons.Button2 && waitForButton2ToBePressed) {
+            waitForButton2ToBePressed = false;
+            isButton2Pressed = true;
+        }
+
+        if (phantom.GetButton() != Buttons.Button2 && !waitForButton2ToBePressed) {
+            waitForButton2ToBePressed = true;
+            isButton2Pressed = false;
+        }
 
         return true;
+    }
+
+
+    /// <summary>
+    ///     Public function to know if a button of the haptic arm is pressed 
+    /// </summary>
+    /// <param name="button">1 for Button1, 2 for Button2</param>
+    public bool GetButtonDown (int button) {
+        if(button == 1) {
+            if(isButton1Pressed) {
+                //When the function is called with a button pressed, set the buttonPressed at false to prevent multiple ON value from one Input
+                isButton1Pressed = false;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        if (button == 2) {
+            if (isButton2Pressed) {
+                isButton2Pressed = false;
+                return true;
+            } else {
+                return false;
+            }
+        }
+        return false;
     }
 }
