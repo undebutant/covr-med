@@ -3,14 +3,13 @@ using System.Collections.Generic;
 using UnityEngine;
 using ManagedPhantom;
 
-//---------------------------------------------------------------------------
-// HAPTIC MANAGER
-//---------------------------------------------------------------------------
 
-
+/// <summary>
+///     The input manager dedicated for the haptic arm
+/// </summary>
 public class HapticManager : MonoBehaviour {
 
-    //declarations
+    // Variables declarations
 
     /// Tag for logging information (Debug purpose only)
     private static string _tag = ".::. HapticManager .::. ";
@@ -21,8 +20,7 @@ public class HapticManager : MonoBehaviour {
     Quaternion handRotation;
 
     
-    Vector3 offset;
-
+    Vector3 offsetPosition;
     Quaternion offsetRotation;
 
     [SerializeField]
@@ -36,24 +34,22 @@ public class HapticManager : MonoBehaviour {
     bool isButton1Pressed;
     bool isButton2Pressed;
 
-    //Variable to reduce plage of Haptic movement
+    // Variable to reduce range of Haptic movement in Unity scale
     [SerializeField]
     int downScale = 150;
 
-    // Variable to desactivate some rotation from the hand to have the seringe follow the haptique corrrectly
-    bool seringeIsSelected = false;
+    // Variable to deactivate some rotations from the hand so that the syringe follow the haptic arm correctly
+    bool isSyringeSelected = false;
 
-    public void SeringeSelected() {
-        seringeIsSelected = true;
+    public void SelectSyringe() {
+        isSyringeSelected = true;
     }
 
-    public void SeringeRelease() {
-        seringeIsSelected = false;
+    public void ReleaseSyringe() {
+        isSyringeSelected = false;
     }
 
-    public SimplePhantomUnity Phantom
-    {
-
+    public SimplePhantomUnity Phantom {
         get
         {
             return phantom;
@@ -61,7 +57,6 @@ public class HapticManager : MonoBehaviour {
     }
 
     public  Vector3 HandPosition {
-
         get {
             return handPosition;
         }
@@ -69,20 +64,19 @@ public class HapticManager : MonoBehaviour {
 
 
     public Quaternion HandRotation {
-
         get {
             return handRotation;
         }
     }
 
 
-    // Initializes communication with Phantom device
+    // Initialize communication with Phantom device
     public bool InitHaptics() {
-        // Initializes variables
+        // Initialize variables
         Init();
 
         phantom = new SimplePhantomUnity();    
-        phantom.AddSchedule(PhantomUpdate,Hd.Priority.HD_RENDER_EFFECT_FORCE_PRIORITY);
+        phantom.AddSchedule(PhantomUpdate, Hd.Priority.HD_RENDER_EFFECT_FORCE_PRIORITY);
         phantom.Start();
 
         return true;
@@ -104,12 +98,12 @@ public class HapticManager : MonoBehaviour {
     }
 
 
-    // Stops device communication
+    // Stop device communication
     public bool StopHaptics() {
         if (phantom == null || !phantom.IsRunning)
             return false;
 
-        while (!phantom.IsAvailable) Debug.Log(_tag + "...");
+        while (phantom.IsAvailable);
 
         // Exit the use of PHANTOM
         phantom.Close();
@@ -119,10 +113,8 @@ public class HapticManager : MonoBehaviour {
     }
 
 
-    // Use this for initialization
     void Start () {
-
-        offset = hand.transform.localPosition;
+        offsetPosition = hand.transform.localPosition;
         offsetRotation = hand.transform.localRotation;
       
         InitHaptics();
@@ -131,45 +123,39 @@ public class HapticManager : MonoBehaviour {
         isButton2Pressed = false;
         waitForButton1ToBePressed = true;
         waitForButton2ToBePressed = true;
-        seringeIsSelected = false;
-    }
-
-
-    // Update is called once per frame
-    void Update() {
-
-        if (phantom != null) 
-        Debug.Log(handPosition);
-
+        isSyringeSelected = false;
     }
 
 
     // Function to be executed asynchronously from the haptic device
-    // Responsable of all the haptic force feedback during simulation
     private bool PhantomUpdate() {
-        
-        //The changes are made because unity has a base with xzy axes and the haptic has a base with zxy
-
+        // Downscaling the movement range in Unity app for the user
         Vector3 haptPosition = phantom.GetPosition() / downScale;
-        //adapting haptic axes to unity axes 
+
+
+        // Axes are swapped because unity has a xzy reference frame and the haptic has a zxy reference frame
         handPosition.x = - haptPosition.z;
         handPosition.z = haptPosition.x;
         handPosition.y = haptPosition.y;
-        handPosition = handPosition + offset;
+        handPosition = handPosition + offsetPosition;
+
 
         Quaternion haptRotation = phantom.GetRotation();
-        //get euler vector from quaternion to be aple to apply changes
+
+        // Converting from quaternion to euler for axes swapping
         Vector3 eulerVector = haptRotation.eulerAngles;
 
+        // Going from Phantom to Unity axes
         float temp = eulerVector.x;
         eulerVector.x = -eulerVector.z;
         eulerVector.z = temp;
 
+        // Going back to quaternion
         haptRotation = Quaternion.Euler(eulerVector.x, eulerVector.y, eulerVector.z);
 
 
-        // Desactivate some rotation from the hand to have the seringe follow the haptique corrrectly
-        if (seringeIsSelected) {
+        // Deactivate some rotations from the hand to have the syringe follow the haptique correctly
+        if (isSyringeSelected) {
             handRotation = haptRotation;
         } else {
             handRotation = haptRotation * offsetRotation;
@@ -178,27 +164,24 @@ public class HapticManager : MonoBehaviour {
 
 
 
-        //Test if the button 1 and 2 are pressed
-        if (phantom.GetButton() == Buttons.Button1 && waitForButton1ToBePressed)
-        {
+        // Test if the button 1 and 2 are pressed
+        // If so, toggle on/off the boolean isButtonPressed
+        if (phantom.GetButton() == Buttons.Button1 && waitForButton1ToBePressed) {
             waitForButton1ToBePressed = false;
             isButton1Pressed = true;
         }
 
-        if (phantom.GetButton() != Buttons.Button1 && !waitForButton1ToBePressed)
-        {
+        if (phantom.GetButton() != Buttons.Button1 && !waitForButton1ToBePressed) {
             waitForButton1ToBePressed = true;
             isButton1Pressed = false;
         }
 
-        if (phantom.GetButton() == Buttons.Button2 && waitForButton2ToBePressed)
-        {
+        if (phantom.GetButton() == Buttons.Button2 && waitForButton2ToBePressed) {
             waitForButton2ToBePressed = false;
             isButton2Pressed = true;
         }
 
-        if (phantom.GetButton() != Buttons.Button2 && !waitForButton2ToBePressed)
-        {
+        if (phantom.GetButton() != Buttons.Button2 && !waitForButton2ToBePressed) {
             waitForButton2ToBePressed = true;
             isButton2Pressed = false;
         }
@@ -206,40 +189,29 @@ public class HapticManager : MonoBehaviour {
         return true;
     }
 
+
     /// <summary>
-    ///     Public function to get if a button of the haptic is pressed 
+    ///     Public function to know if a button of the haptic arm is pressed 
     /// </summary>
     /// <param name="button">1 for Button1, 2 for Button2</param>
-    /// <returns></returns>
-    public bool GetButtonDown (int button)
-    {
-
-        if(button == 1)
-        {
-            if(isButton1Pressed)
-            {
+    public bool GetButtonDown (int button) {
+        if(button == 1) {
+            if(isButton1Pressed) {
                 //When the function is called with a button pressed, set the buttonPressed at false to prevent multiple ON value from one Input
                 isButton1Pressed = false;
                 return true;
-            } else
-            {
+            } else {
                 return false;
             }
-            
         }
-        if (button == 2)
-        {
-            if (isButton2Pressed)
-            {
+        if (button == 2) {
+            if (isButton2Pressed) {
                 isButton2Pressed = false;
                 return true;
-            }
-            else
-            {
+            } else {
                 return false;
             }
         }
-
         return false;
     }
 }
