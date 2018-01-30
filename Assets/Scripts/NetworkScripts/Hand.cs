@@ -45,7 +45,6 @@ public class Hand : NetworkBehaviour {
     ConfigInitializer config;
 
     public void SetHandTransform(Vector3 newPosition, Quaternion newRotation){
-        Debug.LogError("Nouvelle position pour la main : " + newPosition);
         hand.transform.position = newPosition;
         hand.transform.rotation = newRotation;
         syncPlayerTransform.UpdateHandPosition(hand.transform.position);
@@ -62,7 +61,6 @@ public class Hand : NetworkBehaviour {
 
 
     void Update () {
-        Debug.LogError(config.GetInputDevice());
         if (isLocalPlayer) {
             syncPlayerTransform.UpdateHandPosition(hand.transform.position);
             if (config.GetInputDevice() != InputDevice.Remote) {

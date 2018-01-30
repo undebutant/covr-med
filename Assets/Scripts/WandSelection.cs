@@ -98,7 +98,6 @@ public class WandSelection : MonoBehaviour {
     //                GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
     //                // Click on the button only once
     //                if (wandButtonPressed0 && !clicked) {
-    //                    Debug.Log("Button clicked");
     //                    clicked = true;
     //                    mainMenuManager.OnHitButton(hit.collider.gameObject);
     //                }
