@@ -32,8 +32,8 @@ public class Hand : NetworkBehaviour {
     int layerSelectable;
 
     // The angles for spherical rotation of the hand around the player, using controller
-    float angleHorizontal;
-    float angleVertical;
+    float horizontalAngle;
+    float verticalAngle;
 
     [SerializeField]
     [Tooltip("The sensitivity of the controller")]
@@ -42,17 +42,24 @@ public class Hand : NetworkBehaviour {
     //Haptic manager
     public HapticManager hapticManager;
 
+    // The config for the local instance
     ConfigInitializer config;
 
-    public void SetHandTransform(Vector3 newPosition, Quaternion newRotation){
+
+    /// <summary>
+    ///     Update both the position and rotation of the avatar's hand in the local instance and on the network
+    /// </summary>
+    public void SetHandTransform(Vector3 newPosition, Quaternion newRotation) {
         hand.transform.position = newPosition;
         hand.transform.rotation = newRotation;
+
         syncPlayerTransform.UpdateHandPosition(hand.transform.position);
     }
 
-    void Start () {
-        angleHorizontal = 0f;
-        angleVertical = 0f;
+
+    void Start() {
+        horizontalAngle = 0f;
+        verticalAngle = 0f;
 
         layerSelectable = LayerMask.NameToLayer("selectionable");
 
@@ -60,21 +67,20 @@ public class Hand : NetworkBehaviour {
     }
 
 
-    void Update () {
+    void Update() {
         if (isLocalPlayer) {
-            syncPlayerTransform.UpdateHandPosition(hand.transform.position);
             if (config.GetInputDevice() != InputDevice.Remote) {
                 // Using controller
                 if (inputManager.controllerOn) {
                     Vector3 newpos = hand.transform.position;
 
-                    angleHorizontal = angleHorizontal + Input.GetAxis("HorizontalDpad") * Time.deltaTime * speed;
-                    angleVertical = angleVertical + Input.GetAxis("VerticalDpad") * Time.deltaTime * speed;
-                    angleVertical = Mathf.Clamp(angleVertical, -1, 1);
+                    horizontalAngle = horizontalAngle + Input.GetAxis("HorizontalDpad") * Time.deltaTime * speed;
+                    verticalAngle = verticalAngle + Input.GetAxis("VerticalDpad") * Time.deltaTime * speed;
+                    verticalAngle = Mathf.Clamp(verticalAngle, -1, 1);
 
-                    newpos.z = prefabTransform.position.z - Mathf.Sin(angleHorizontal) * 0.66f;
-                    newpos.x = prefabTransform.position.x + Mathf.Cos(angleHorizontal) * 0.66f + Mathf.Cos(angleVertical) * 0.66f - 0.66f;
-                    newpos.y = prefabTransform.position.y + Mathf.Sin(angleVertical) * 0.66f;
+                    newpos.z = prefabTransform.position.z - Mathf.Sin(horizontalAngle) * 0.66f;
+                    newpos.x = prefabTransform.position.x + Mathf.Cos(horizontalAngle) * 0.66f + Mathf.Cos(verticalAngle) * 0.66f - 0.66f;
+                    newpos.y = prefabTransform.position.y + Mathf.Sin(verticalAngle) * 0.66f;
 
                     //TODO WARNING, use the value angleHorizontal to move verticaly to fix a bug
 
@@ -99,22 +105,19 @@ public class Hand : NetworkBehaviour {
                             }
                         }
                     }
-
-
+                // Using haptic arm
                 } else {
-
                     // Move the GameObject according to the haptic arm
                     hand.transform.localPosition = hapticManager.HandPosition;
                     // Rotate the GameObject according to the haptic arm
                     hand.transform.localRotation = hapticManager.HandRotation;
 
                     syncPlayerTransform.UpdateHandPosition(hand.transform.position);
-
-
                 }
-            } else {
-                hand.transform.position = syncPlayerTransform.getHandPosition();
             }
+        // If it is not a local player, only update the hand
+        } else {
+            hand.transform.position = syncPlayerTransform.getHandPosition();
         }
     }
 }
