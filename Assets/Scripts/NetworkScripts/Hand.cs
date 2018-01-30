@@ -126,6 +126,7 @@ public class Hand : NetworkBehaviour {
                     {
                         //... release the object
                         objectDrag.ReleaseObject();
+                        // Reactivate the hand + tell the haptic manager that a seringe is not selected
                         hapticManager.SeringeRelease();
                         handMesh.SetActive(true);
                     }
@@ -137,6 +138,8 @@ public class Hand : NetworkBehaviour {
 
                             // ... start dragging the object
                             objectDrag.SelectObject(hand, objectToSelect, 0f);
+
+                            // When the object selected is a seringe, make the hand desapear and tell the haptic manager that a seringe is selected
                             if(objectToSelect.CompareTag("Seringe")) {
                                 hapticManager.SeringeSelected();
                                 handMesh.SetActive(false);

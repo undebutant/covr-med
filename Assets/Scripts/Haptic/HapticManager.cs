@@ -167,7 +167,9 @@ public class HapticManager : MonoBehaviour {
 
         haptRotation = Quaternion.Euler(eulerVector.x, eulerVector.y, eulerVector.z);
 
-        if(seringeIsSelected) {
+
+        // Desactivate some rotation from the hand to have the seringe follow the haptique corrrectly
+        if (seringeIsSelected) {
             handRotation = haptRotation;
         } else {
             handRotation = haptRotation * offsetRotation;
