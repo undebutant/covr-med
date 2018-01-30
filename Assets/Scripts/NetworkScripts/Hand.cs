@@ -25,6 +25,9 @@ public class Hand : NetworkBehaviour {
     [SerializeField]
     [Tooltip("The hand GameObject of this avatar")]
     GameObject hand;
+    [SerializeField]
+    [Tooltip("The hand GameObject of this avatar")]
+    GameObject handMesh;
 
     [SerializeField]
     Camera avatarCamera;
@@ -123,6 +126,8 @@ public class Hand : NetworkBehaviour {
                     {
                         //... release the object
                         objectDrag.ReleaseObject();
+                        hapticManager.SeringeRelease();
+                        handMesh.SetActive(true);
                     }
 
                     else
@@ -132,7 +137,10 @@ public class Hand : NetworkBehaviour {
 
                             // ... start dragging the object
                             objectDrag.SelectObject(hand, objectToSelect, 0f);
-
+                            if(objectToSelect.CompareTag("Seringe")) {
+                                hapticManager.SeringeSelected();
+                                handMesh.SetActive(false);
+                            }
                         }
 
                     }

@@ -70,6 +70,12 @@ public class ObjectDrag : MonoBehaviour {
         if (isDragFeatureOn) {
             Vector3 newPos = deviceSelector.transform.position;
             Quaternion newRot = deviceSelector.transform.rotation;
+               
+            // If the selected object is a seringe, we apply a 180°C rotation on the X axes otherwise the seringe will be upside down
+            if(objectSelected.CompareTag("Seringe")) {
+                newRot = newRot * Quaternion.Euler(0, 0, -90);
+            }
+            
 
             Vector3 zonePosition = zone.transform.position;
 

@@ -36,9 +36,20 @@ public class HapticManager : MonoBehaviour {
     bool isButton1Pressed;
     bool isButton2Pressed;
 
-    //Variaple to reduce plage of Haptic movement
+    //Variable to reduce plage of Haptic movement
     [SerializeField]
     int downScale = 150;
+
+    // Variable to desactivate some rotation from the hand to have the seringe follow the haptique corrrectly
+    bool seringeIsSelected = false;
+
+    public void SeringeSelected() {
+        seringeIsSelected = true;
+    }
+
+    public void SeringeRelease() {
+        seringeIsSelected = false;
+    }
 
     public SimplePhantomUnity Phantom
     {
@@ -120,6 +131,7 @@ public class HapticManager : MonoBehaviour {
         isButton2Pressed = false;
         waitForButton1ToBePressed = true;
         waitForButton2ToBePressed = true;
+        seringeIsSelected = false;
     }
 
 
@@ -154,7 +166,13 @@ public class HapticManager : MonoBehaviour {
         eulerVector.z = temp;
 
         haptRotation = Quaternion.Euler(eulerVector.x, eulerVector.y, eulerVector.z);
-        handRotation = haptRotation * offsetRotation;
+
+        if(seringeIsSelected) {
+            handRotation = haptRotation;
+        } else {
+            handRotation = haptRotation * offsetRotation;
+        }
+        
 
 
 
