@@ -48,8 +48,18 @@ public class WandSelection : MonoBehaviour {
             if (playerPrefab.GetComponent<NetworkAvatarSetup>().isLocalPlayer)
                 prefabPlayer = playerPrefab;
         }
-        Debug.LogError(prefabPlayer.name);
         yield return null;
+    }
+
+    /// <summary>
+    ///     Updates the prefab player's hand transform with the wand's transform
+    /// </summary>
+    /// <returns></returns>
+    void UpdatePrefabPlayerHand() {
+        if (prefabPlayer != null) {
+            GameObject wand = GameObject.Find("HandNode");
+            prefabPlayer.GetComponent<Hand>().SetHandTransform(wand.transform.position, wand.transform.rotation);
+        }
     }
 
 	// Use this for initialization
@@ -63,6 +73,9 @@ public class WandSelection : MonoBehaviour {
 	
 	// Update is called once per frame
     //void Update () {
+    //    // Update the prefab player hand's transform
+    //    UpdatePrefabPlayerHand();
+
     //    Vector3 fwd = transform.TransformDirection(Vector3.forward);
     //    RaycastHit hit;
     //    if (MiddleVR.VRDeviceMgr != null) {

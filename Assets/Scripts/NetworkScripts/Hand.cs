@@ -42,67 +42,81 @@ public class Hand : NetworkBehaviour {
     //Haptic manager
     public HapticManager hapticManager;
 
+    ConfigInitializer config;
+
+    public void SetHandTransform(Vector3 newPosition, Quaternion newRotation){
+        Debug.LogError("Nouvelle position pour la main : " + newPosition);
+        hand.transform.position = newPosition;
+        hand.transform.rotation = newRotation;
+        syncPlayerTransform.UpdateHandPosition(hand.transform.position);
+    }
+
     void Start () {
         angleHorizontal = 0f;
         angleVertical = 0f;
 
         layerSelectable = LayerMask.NameToLayer("selectionable");
-        
+
+        config = GameObject.FindObjectOfType<ConfigInitializer>();
     }
 
 
     void Update () {
+        Debug.LogError(config.GetInputDevice());
         if (isLocalPlayer) {
-            // Using controller
-            if (inputManager.controllerOn) {
-                Vector3 newpos = hand.transform.position;
-                
-                angleHorizontal = angleHorizontal + Input.GetAxis("HorizontalDpad") * Time.deltaTime * speed;
-                angleVertical = angleVertical + Input.GetAxis("VerticalDpad") * Time.deltaTime * speed;
-                angleVertical = Mathf.Clamp(angleVertical, -1, 1);
+            syncPlayerTransform.UpdateHandPosition(hand.transform.position);
+            if (config.GetInputDevice() != InputDevice.Remote) {
+                // Using controller
+                if (inputManager.controllerOn) {
+                    Vector3 newpos = hand.transform.position;
 
-                newpos.z = prefabTransform.position.z - Mathf.Sin(angleHorizontal) * 0.66f;
-                newpos.x = prefabTransform.position.x + Mathf.Cos(angleHorizontal) * 0.66f + Mathf.Cos(angleVertical) * 0.66f - 0.66f;
-                newpos.y = prefabTransform.position.y + Mathf.Sin(angleVertical) * 0.66f;
+                    angleHorizontal = angleHorizontal + Input.GetAxis("HorizontalDpad") * Time.deltaTime * speed;
+                    angleVertical = angleVertical + Input.GetAxis("VerticalDpad") * Time.deltaTime * speed;
+                    angleVertical = Mathf.Clamp(angleVertical, -1, 1);
 
-                //TODO WARNING, use the value angleHorizontal to move verticaly to fix a bug
+                    newpos.z = prefabTransform.position.z - Mathf.Sin(angleHorizontal) * 0.66f;
+                    newpos.x = prefabTransform.position.x + Mathf.Cos(angleHorizontal) * 0.66f + Mathf.Cos(angleVertical) * 0.66f - 0.66f;
+                    newpos.y = prefabTransform.position.y + Mathf.Sin(angleVertical) * 0.66f;
 
-                hand.transform.position = newpos;
-                syncPlayerTransform.UpdateHandPosition(hand.transform.position);
+                    //TODO WARNING, use the value angleHorizontal to move verticaly to fix a bug
 
-                if (Input.GetButtonDown("Fire1")) {
-                    if (objectDrag.GetIsDragFeatureOn()) {
-                        objectDrag.ReleaseObject();
-                    } else {
-                        // Raycast for the controller only
-                        Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(hand.transform.position));
+                    hand.transform.position = newpos;
+                    syncPlayerTransform.UpdateHandPosition(hand.transform.position);
 
-                        RaycastHit shootHit;
+                    if (Input.GetButtonDown("Fire1")) {
+                        if (objectDrag.GetIsDragFeatureOn()) {
+                            objectDrag.ReleaseObject();
+                        } else {
+                            // Raycast for the controller only
+                            Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(hand.transform.position));
 
-                        // Whenever the rayCast hits something...
-                        if (Physics.Raycast(ray, out shootHit, 1000)) {
-                            // ... matching the layer
-                            if (shootHit.collider.gameObject.layer == layerSelectable) {
-                                objectDrag.SelectObject(hand, shootHit.collider.gameObject,0f);
+                            RaycastHit shootHit;
+
+                            // Whenever the rayCast hits something...
+                            if (Physics.Raycast(ray, out shootHit, 1000)) {
+                                // ... matching the layer
+                                if (shootHit.collider.gameObject.layer == layerSelectable) {
+                                    objectDrag.SelectObject(hand, shootHit.collider.gameObject, 0f);
+                                }
                             }
                         }
                     }
+
+
+                } else {
+
+                    // Move the GameObject according to the haptic arm
+                    hand.transform.localPosition = hapticManager.HandPosition;
+                    // Rotate the GameObject according to the haptic arm
+                    hand.transform.localRotation = hapticManager.HandRotation;
+
+                    syncPlayerTransform.UpdateHandPosition(hand.transform.position);
+
+
                 }
-
-
             } else {
-    
-                // Move the GameObject according to the haptic arm
-                hand.transform.localPosition = hapticManager.HandPosition;
-                // Rotate the GameObject according to the haptic arm
-                hand.transform.localRotation = hapticManager.HandRotation;
-
-                syncPlayerTransform.UpdateHandPosition(hand.transform.position);
-
-
+                hand.transform.position = syncPlayerTransform.getHandPosition();
             }
-        } else {
-            hand.transform.position = syncPlayerTransform.getHandPosition();
         }
     }
 }
