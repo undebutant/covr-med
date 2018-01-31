@@ -16,27 +16,39 @@ public class HapticManager : MonoBehaviour {
 
     private SimplePhantomUnity phantom = null;
 
+    [SerializeField]
+    GameObject hand;
+
     Vector3 handPosition;
     Quaternion handRotation;
 
     
     Vector3 offsetPosition;
     Quaternion offsetRotation;
+    Vector3 offsetGlobalPosition;
 
-    [SerializeField]
-    GameObject hand;
+    // Last position to calculate friction forces
+    Vector3 lastPosition;
 
 
-    //Boolean and state to recreate the GetButtonDown from the haptic
-
+    // Boolean and state to recreate the GetButtonDown from the haptic
     bool waitForButton1ToBePressed;
     bool waitForButton2ToBePressed;
     bool isButton1Pressed;
     bool isButton2Pressed;
 
+
     // Variable to reduce range of Haptic movement in Unity scale
     [SerializeField]
     int downScale = 150;
+
+
+    [SerializeField]
+    HandCollider handColliderScript;
+
+    [SerializeField]
+    Collider handCollider;
+
 
     // Variable to deactivate some rotations from the hand so that the syringe follow the haptic arm correctly
     bool isSyringeSelected = false;
@@ -49,19 +61,12 @@ public class HapticManager : MonoBehaviour {
         isSyringeSelected = false;
     }
 
-    public SimplePhantomUnity Phantom {
-        get
-        {
-            return phantom;
-        }
-    }
 
     public  Vector3 HandPosition {
         get {
             return handPosition;
         }
     }
-
 
     public Quaternion HandRotation {
         get {
@@ -88,6 +93,7 @@ public class HapticManager : MonoBehaviour {
         // Initialization of hand position and orientation
         handPosition = Vector3.zero;
         handRotation = Quaternion.identity;
+        lastPosition = Vector3.zero;
     }
 
 
@@ -116,8 +122,6 @@ public class HapticManager : MonoBehaviour {
         System.Diagnostics.Process.GetCurrentProcess().Kill();
 #endif
 
-
-
         return true;
     }
 
@@ -125,7 +129,8 @@ public class HapticManager : MonoBehaviour {
     void Start () {
         offsetPosition = hand.transform.localPosition;
         offsetRotation = hand.transform.localRotation;
-      
+        offsetGlobalPosition = hand.transform.position;
+
         InitHaptics();
 
         isButton1Pressed = false;
@@ -141,13 +146,11 @@ public class HapticManager : MonoBehaviour {
         // Downscaling the movement range in Unity app for the user
         Vector3 haptPosition = phantom.GetPosition() / downScale;
 
-
         // Axes are swapped because unity has a xzy reference frame and the haptic has a zxy reference frame
         handPosition.x = - haptPosition.z;
         handPosition.z = haptPosition.x;
         handPosition.y = haptPosition.y;
         handPosition = handPosition + offsetPosition;
-
 
         Quaternion haptRotation = phantom.GetRotation();
 
@@ -169,8 +172,44 @@ public class HapticManager : MonoBehaviour {
         } else {
             handRotation = haptRotation * offsetRotation;
         }
-        
 
+        // Test for forces 
+        Vector3 force = new Vector3(0,0,0);
+
+        float maxForceFriction = 1.5f;
+
+        // Test for the friction of the tissues
+        if (handColliderScript.GetIsContactTissue()) {
+            if (isSyringeSelected) {
+                // In the case we have to apply friction for the syringe...
+                force.y = (lastPosition.y - haptPosition.y) * 1500;
+                if (force.y > maxForceFriction) {
+                    force.y = maxForceFriction;
+                }
+
+
+                if (force.y < -maxForceFriction) {
+                    force.y = -maxForceFriction;
+                }
+            } else {
+                // ... else we don't hold the syringe, then, we just hit the table, and we don't want to go through it
+                force.y = 300 * (handColliderScript.GetLastTissueY() - offsetGlobalPosition.y - handPosition.y + offsetPosition.y);
+                if (force.y < 0) {
+                    force.y = 0;
+                }
+            }
+            
+        }
+
+        // Test for the table, because Brian is on the table
+        if (handColliderScript.GetIsContactTable() && isSyringeSelected) {
+            force.y = 300 * (handColliderScript.GetLastTableY() - offsetGlobalPosition.y - handPosition.y + offsetPosition.y);
+            if(force.y < 0) {
+                force.y = 0;
+            }
+        }
+
+        Phantom.SetForce(force);
 
 
         // Test if the button 1 and 2 are pressed
@@ -194,6 +233,8 @@ public class HapticManager : MonoBehaviour {
             waitForButton2ToBePressed = true;
             isButton2Pressed = false;
         }
+
+        lastPosition = haptPosition;
 
         return true;
     }
