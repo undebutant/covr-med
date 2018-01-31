@@ -148,7 +148,7 @@ public class Hand : NetworkBehaviour {
                                 objectDrag.SelectObject(hand, objectToSelect, 0f);
 
                                 // When the object selected is a syringe, make the hand disappear and tell the haptic manager that a syringe is selected
-                                if (objectToSelect.CompareTag("Seringe")) {
+                                if (objectToSelect.CompareTag("Syringe")) {
                                     hapticManager.SelectSyringe();
                                     handMesh.SetActive(false);
                                 }
