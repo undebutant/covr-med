@@ -103,8 +103,9 @@ public class HapticManager : MonoBehaviour {
         if (phantom == null || !phantom.IsRunning)
             return false;
 
-        while (phantom.IsAvailable);
+        while (!Phantom.IsAvailable);
 
+        phantom.Stop();
         // Exit the use of PHANTOM
         phantom.Close();
         phantom = null;
