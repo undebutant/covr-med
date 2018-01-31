@@ -100,15 +100,23 @@ public class HapticManager : MonoBehaviour {
 
     // Stop device communication
     public bool StopHaptics() {
+
+        // Bugfix very dirty for the Build Only
+#if UNITY_EDITOR
         if (phantom == null || !phantom.IsRunning)
             return false;
 
-        while (!Phantom.IsAvailable);
+        while (!Phantom.IsAvailable) ;
 
-        phantom.Stop();
+
         // Exit the use of PHANTOM
         phantom.Close();
         phantom = null;
+#else
+        System.Diagnostics.Process.GetCurrentProcess().Kill();
+#endif
+
+
 
         return true;
     }
