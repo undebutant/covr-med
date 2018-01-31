@@ -45,6 +45,10 @@ public class HapticManager : MonoBehaviour {
     [SerializeField]
     int downScale = 150;
 
+    // HandCollider Script
+    [SerializeField]
+    HandCollider handCollider;
+
     // Variable to deactivate some rotations from the hand so that the syringe follow the haptic arm correctly
     bool isSyringeSelected = false;
 
@@ -55,6 +59,7 @@ public class HapticManager : MonoBehaviour {
     public void ReleaseSyringe() {
         isSyringeSelected = false;
     }
+
 
     public SimplePhantomUnity Phantom {
         get
@@ -185,19 +190,27 @@ public class HapticManager : MonoBehaviour {
         // TEST for forces 
         Vector3 force = new Vector3(0,0,0);
 
+        float maxForceFriction = 1.5f;
+
         // Test for the friction of the tissues
-        if (handPosition.y < 0) {
-            force.y = (lastPosition.y - haptPosition.y)*1500;
-            if(force.y>1.5) {
-                force.y = 1.5f;
+        if (handCollider.getIsContactTissue() && isSyringeSelected) {
+            force.y = (lastPosition.y - haptPosition.y) * 1500;
+            if (force.y> maxForceFriction) {
+                force.y = maxForceFriction;
             }
+            
+
+            if (force.y < -maxForceFriction) {
+                force.y = -maxForceFriction;
+            }
+            
         }
 
-
+        /*
         // Test for the table, because Brian is on the table
         if (handPosition.y<-0.2) {
             force.y = 300 * (-0.2f - handPosition.y);
-        }
+        }*/
 
         Phantom.SetForce(force);
 
