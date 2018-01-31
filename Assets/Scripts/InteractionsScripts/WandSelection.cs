@@ -9,10 +9,10 @@ using UnityEngine.SceneManagement;
 public class WandSelection : MonoBehaviour {
 
     [SerializeField]
-    private string selectableObjectsLayerName = "selectionable";
+    private string selectableObjectsLayerName = "Selectable";
 
     [SerializeField]
-    private string buttonObjectsLayerName = "button";
+    private string buttonObjectsLayerName = "Button";
 
     [SerializeField]
     MainMenuManager mainMenuManager;

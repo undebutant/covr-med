@@ -6,7 +6,7 @@ using UnityEngine;
 
 /// <summary>
 ///     Script allowing snap, drag and drop for specific objects in the scene.
-///     Objects need to have a NetworkIdentity, to be in the "selectionable" layer,
+///     Objects need to have a NetworkIdentity, to be in the "Selectable" layer,
 ///     and to have a collider for the raycast.
 /// </summary>
 public class ObjectDrag : MonoBehaviour {
