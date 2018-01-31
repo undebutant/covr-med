@@ -26,7 +26,8 @@ public enum DisplayDevice {
 /// </summary>
 public enum InputDevice {
     Controller,
-    Haptic
+    Haptic,
+    Remote
 }
 
 
