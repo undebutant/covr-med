@@ -60,7 +60,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
             LerpPosition();
             SlerpRotation();
         }
-        // Else we send the movement to the server
+            // Else we send the movement to the server
         else {
             TransmitPositionToServer();
         }
