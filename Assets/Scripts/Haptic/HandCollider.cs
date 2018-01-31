@@ -7,6 +7,13 @@ public class HandCollider : MonoBehaviour {
     [SerializeField]
     Hand handScript;
 
+    // Stock the height of the last table entered in collision
+    float lastTissueY;
+
+    public float getLastTissueY() {
+        return lastTissueY;
+    }
+
     // Variable to know if we are in the tissue
     bool isContactTissue = false;
 
@@ -20,6 +27,13 @@ public class HandCollider : MonoBehaviour {
 
     public void LeaveTissue() {
         isContactTissue = false;
+    }
+
+    // Stock the height of the last table entered in collision
+    float lastTableY;
+
+    public float getLastTableY() {
+        return lastTableY;
     }
 
     // Variable to know if we are in the table
@@ -50,6 +64,8 @@ public class HandCollider : MonoBehaviour {
         layerTable = LayerMask.NameToLayer("Table");
         isContactTissue = false;
         isContactTable = false;
+        lastTableY = 0;
+        lastTissueY = 0;
     }
 
 
@@ -64,11 +80,13 @@ public class HandCollider : MonoBehaviour {
         //If the object that collides with the hand is a patient object...
         if (other.gameObject.layer == layerPatient) {
             InTissue();
+            lastTissueY = other.bounds.max.y;
         }
 
         //If the object that collides with the hand is a table object...
         if (other.gameObject.layer == layerTable) {
             ContacteTable();
+            lastTableY = other.bounds.max.y;
         }
 
     }

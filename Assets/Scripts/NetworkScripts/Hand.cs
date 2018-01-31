@@ -32,6 +32,9 @@ public class Hand : NetworkBehaviour {
     GameObject handMesh;
 
     [SerializeField]
+    HandCollider handColliderScript;
+
+    [SerializeField]
     Camera avatarCamera;
 
     GameObject objectToSelect;
@@ -135,12 +138,13 @@ public class Hand : NetworkBehaviour {
                     if (hapticManager.GetButtonDown(1)) {
                         // If an object is currently beeing draged ...
                         if (objectDrag.GetIsDragFeatureOn()) {
-                            //... release the object
-                            objectDrag.ReleaseObject();
-                            // Reactivate the hand and tell the haptic manager that a syringe is not selected
-                            hapticManager.ReleaseSyringe();
-                            handMesh.SetActive(true);
-
+                            if (!handColliderScript.getIsContactTable() && !handColliderScript.getIsContactTissue()) {
+                                //... release the object
+                                objectDrag.ReleaseObject();
+                                // Reactivate the hand and tell the haptic manager that a syringe is not selected
+                                hapticManager.ReleaseSyringe();
+                                handMesh.SetActive(true);
+                            }
                             //If an object can be selected ...
                         } else {
                             if (objectToSelect != null) {

@@ -22,6 +22,7 @@ public class HapticManager : MonoBehaviour {
     
     Vector3 offsetPosition;
     Quaternion offsetRotation;
+    Vector3 offsetGlobalPosition;
 
     [SerializeField]
     GameObject hand;
@@ -47,7 +48,11 @@ public class HapticManager : MonoBehaviour {
 
     // HandCollider Script
     [SerializeField]
-    HandCollider handCollider;
+    HandCollider handColliderScript;
+
+    // HandCollider
+    [SerializeField]
+    Collider handCollider;
 
     // Variable to deactivate some rotations from the hand so that the syringe follow the haptic arm correctly
     bool isSyringeSelected = false;
@@ -138,7 +143,10 @@ public class HapticManager : MonoBehaviour {
     void Start () {
         offsetPosition = hand.transform.localPosition;
         offsetRotation = hand.transform.localRotation;
-      
+        offsetGlobalPosition = hand.transform.position;
+
+
+
         InitHaptics();
 
         isButton1Pressed = false;
@@ -185,32 +193,43 @@ public class HapticManager : MonoBehaviour {
         }
 
 
-
         
+
+
         // TEST for forces 
         Vector3 force = new Vector3(0,0,0);
 
         float maxForceFriction = 1.5f;
 
         // Test for the friction of the tissues
-        if (handCollider.getIsContactTissue() && isSyringeSelected) {
-            force.y = (lastPosition.y - haptPosition.y) * 1500;
-            if (force.y> maxForceFriction) {
-                force.y = maxForceFriction;
-            }
-            
+        if (handColliderScript.getIsContactTissue()) {
+            if (isSyringeSelected) {
+                force.y = (lastPosition.y - haptPosition.y) * 1500;
+                if (force.y > maxForceFriction) {
+                    force.y = maxForceFriction;
+                }
 
-            if (force.y < -maxForceFriction) {
-                force.y = -maxForceFriction;
+
+                if (force.y < -maxForceFriction) {
+                    force.y = -maxForceFriction;
+                }
+            } else {
+                force.y = 300 * (handColliderScript.getLastTissueY() - offsetGlobalPosition.y - handPosition.y + offsetPosition.y);
+                if (force.y < 0) {
+                    force.y = 0;
+                }
             }
             
         }
 
-        /*
+        
         // Test for the table, because Brian is on the table
-        if (handPosition.y<-0.2) {
-            force.y = 300 * (-0.2f - handPosition.y);
-        }*/
+        if (handColliderScript.getIsContactTable() && isSyringeSelected) {
+            force.y = 300 * (handColliderScript.getLastTableY() - offsetGlobalPosition.y - handPosition.y + offsetPosition.y);
+            if(force.y < 0) {
+                force.y = 0;
+            }
+        }
 
         Phantom.SetForce(force);
 
