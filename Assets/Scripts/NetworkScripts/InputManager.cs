@@ -7,7 +7,7 @@ public class InputManager : NetworkBehaviour {
     
 
     [Tooltip("Indicates if the player is using a controller")]
-    public bool controllerOn;
+    //public bool controllerOn;
 
     // Transform of the camera and Rigibody of the parent
     public Transform playerTransformCamera;
@@ -29,8 +29,13 @@ public class InputManager : NetworkBehaviour {
     // Current Y rotation of the camera
     float rotationY = 0F;
 
-    
-   
+    // The config for the local instance
+    ConfigInitializer config;
+
+
+    private void Start() {
+        config = GameObject.FindObjectOfType<ConfigInitializer>();
+    }
 
 
     void Update () {
@@ -38,7 +43,7 @@ public class InputManager : NetworkBehaviour {
             float rotationX;
 
             // Handling inputs according to the boolean controllerOn
-            if (controllerOn) {
+            if (config.GetInputDevice() == InputDevice.Controller) {
                 rotationX = playerTransformCamera.localEulerAngles.y + Input.GetAxis("Horizontal2") * sensitivityXAxis;
                 rotationY += -Input.GetAxis("Vertical2") * sensitivityYAxis;
                 rotationY = Mathf.Clamp(rotationY, minimumY, maximumY);

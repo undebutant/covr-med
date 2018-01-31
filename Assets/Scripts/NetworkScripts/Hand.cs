@@ -86,7 +86,7 @@ public class Hand : NetworkBehaviour {
         if (isLocalPlayer) {
             if (config.GetInputDevice() != InputDevice.Remote) {
                 // Using controller
-                if (inputManager.controllerOn) {
+                if (config.GetInputDevice() == InputDevice.Controller) {
                     Vector3 newpos = hand.transform.position;
 
                     horizontalAngle = horizontalAngle + Input.GetAxis("HorizontalDpad") * Time.deltaTime * speed;
