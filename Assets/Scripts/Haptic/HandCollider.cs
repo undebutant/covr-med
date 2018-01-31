@@ -7,20 +7,20 @@ public class HandCollider : MonoBehaviour {
     [SerializeField]
     Hand handScript;
 
-    // The int value of the layer mask "selectionable"
+    // The int value of the layer mask "Selectable"
     int layerSelectable;
 
     void Start() {
 
-        //Initiate the value of the layer "selectionable"
-        layerSelectable = LayerMask.NameToLayer("selectionable");
+        //Initiate the value of the layer "Selectable"
+        layerSelectable = LayerMask.NameToLayer("Selectable");
 
     }
 
 
     private void OnTriggerEnter(Collider other) {
 
-        //If the object that collides with the hand is a selectionable object...
+        //If the object that collides with the hand is a selectable object...
         if (other.gameObject.layer == layerSelectable) {
             // ... tell the handScript that he can grab this object
             handScript.ObjectToSelect = other.gameObject;
@@ -31,7 +31,7 @@ public class HandCollider : MonoBehaviour {
 
     private void OnTriggerExit(Collider other) {
 
-        //If the object no longer colliding with the hand is a selectionable object...
+        //If the object no longer colliding with the hand is a selectable object...
         if (other.gameObject.layer == layerSelectable)
         {
             // ... tell the handscript that he can no longer grab it

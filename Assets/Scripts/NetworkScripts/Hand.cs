@@ -36,7 +36,7 @@ public class Hand : NetworkBehaviour {
 
     GameObject objectToSelect;
 
-    // The int value of the layer mask "selectionable"
+    // The int value of the layer mask "Selectable"
     int layerSelectable;
 
     // The angles for spherical rotation of the hand around the player, using controller
@@ -76,7 +76,7 @@ public class Hand : NetworkBehaviour {
 
         objectToSelect = null;
 
-        layerSelectable = LayerMask.NameToLayer("selectionable");
+        layerSelectable = LayerMask.NameToLayer("Selectable");
 
         config = GameObject.FindObjectOfType<ConfigInitializer>();
     }
