@@ -204,6 +204,7 @@ public class HapticManager : MonoBehaviour {
         // Test for the friction of the tissues
         if (handColliderScript.getIsContactTissue()) {
             if (isSyringeSelected) {
+                // If we are the syringe friction ...
                 force.y = (lastPosition.y - haptPosition.y) * 1500;
                 if (force.y > maxForceFriction) {
                     force.y = maxForceFriction;
@@ -214,6 +215,7 @@ public class HapticManager : MonoBehaviour {
                     force.y = -maxForceFriction;
                 }
             } else {
+                // ... else we are the hand so like a table
                 force.y = 300 * (handColliderScript.getLastTissueY() - offsetGlobalPosition.y - handPosition.y + offsetPosition.y);
                 if (force.y < 0) {
                     force.y = 0;
