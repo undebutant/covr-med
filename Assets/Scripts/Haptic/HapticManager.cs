@@ -26,6 +26,8 @@ public class HapticManager : MonoBehaviour {
     [SerializeField]
     GameObject hand;
 
+    //Last position to calculate friction forces
+    Vector3 lastPosition;
 
     //Boolean and state to recreate the GetButtonDown from the haptic
 
@@ -33,6 +35,11 @@ public class HapticManager : MonoBehaviour {
     bool waitForButton2ToBePressed;
     bool isButton1Pressed;
     bool isButton2Pressed;
+
+    private void Update() {
+        //Debug.LogError(handPosition);
+    }
+   
 
     // Variable to reduce range of Haptic movement in Unity scale
     [SerializeField]
@@ -88,6 +95,7 @@ public class HapticManager : MonoBehaviour {
         // Initialization of hand position and orientation
         handPosition = Vector3.zero;
         handRotation = Quaternion.identity;
+        lastPosition = Vector3.zero;
     }
 
 
@@ -141,6 +149,7 @@ public class HapticManager : MonoBehaviour {
         // Downscaling the movement range in Unity app for the user
         Vector3 haptPosition = phantom.GetPosition() / downScale;
 
+        
 
         // Axes are swapped because unity has a xzy reference frame and the haptic has a zxy reference frame
         handPosition.x = - haptPosition.z;
@@ -169,8 +178,28 @@ public class HapticManager : MonoBehaviour {
         } else {
             handRotation = haptRotation * offsetRotation;
         }
-        
 
+
+
+        
+        // TEST for forces 
+        Vector3 force = new Vector3(0,0,0);
+
+        // Test for the friction of the tissues
+        if (handPosition.y < 0) {
+            force.y = (lastPosition.y - haptPosition.y)*1500;
+            if(force.y>1.5) {
+                force.y = 1.5f;
+            }
+        }
+
+
+        // Test for the table, because Brian is on the table
+        if (handPosition.y<-0.2) {
+            force.y = 300 * (-0.2f - handPosition.y);
+        }
+
+        Phantom.SetForce(force);
 
 
         // Test if the button 1 and 2 are pressed
@@ -194,6 +223,8 @@ public class HapticManager : MonoBehaviour {
             waitForButton2ToBePressed = true;
             isButton2Pressed = false;
         }
+
+        lastPosition = haptPosition;
 
         return true;
     }
