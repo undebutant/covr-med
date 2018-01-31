@@ -28,6 +28,7 @@ public class HeadNodeManager : MonoBehaviour {
 	// Update is called once per frame
 	void Update () {
 
+        /*
         // Wait for the WandSelection to find the local prefab player
         if (prefabPlayer == null)
             prefabPlayer = wandSelection.prefabPlayer;
@@ -40,5 +41,6 @@ public class HeadNodeManager : MonoBehaviour {
         // Set the prefab's camera transform
         GameObject prefabPlayerCamera = prefabPlayer.GetComponent<NetworkAvatarSetup>().GetPlayerCamera();
         prefabPlayerCamera.transform.rotation = newRotation;
+        */
     }
 }
