@@ -62,16 +62,17 @@ public class MainMenuInputManager : MonoBehaviour {
 
     void HandleHapticInputs() {
 
-        // Handle the laser's position
-        Vector3 hapticPosition = hapticManager.HandPosition;
-
         // Handle the laser's rotation
         Quaternion hapticRotation = hapticManager.HandRotation;
 
         laser.transform.localRotation = Quaternion.EulerAngles(0, hapticRotation.ToEulerAngles().y, -hapticRotation.ToEulerAngles().z);
+
+        // Handle the laser's position
+        Vector3 hapticPosition = hapticManager.HandPosition;
+
         laser.transform.localPosition = new Vector3(-hapticPosition.x, hapticPosition.y, -hapticPosition.z) * hapticArmMotionCoefficient;
 
-        Debug.DrawRay(laser.transform.position, laser.transform.right * 100);
+        // Fire a raycast if the haptic arm's button is pressed, and transmit the menu's hit button to the main menu manager
         if (hapticManager.GetButtonDown(1)) {
             rayFired = new Ray(laser.transform.position, laser.transform.right);
 
@@ -85,6 +86,8 @@ public class MainMenuInputManager : MonoBehaviour {
 
     void HandleRemoteInputs() {
         // For now, handled by MiddleVR, edit if needed
+        // Deactivate the cube used for the haptic arm
+        laser.SetActive(false);
     }
 
 
