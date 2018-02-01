@@ -19,6 +19,9 @@ public class MainMenuInputManager : MonoBehaviour {
     [SerializeField]
     GameObject laser;
 
+    [SerializeField]
+    float hapticArmMotionCoefficient = 5.0f;
+
 
     // The raycast used for selection
     Ray rayFired;
@@ -66,18 +69,11 @@ public class MainMenuInputManager : MonoBehaviour {
         Quaternion hapticRotation = hapticManager.HandRotation;
 
         laser.transform.localRotation = Quaternion.EulerAngles(0, hapticRotation.ToEulerAngles().y, -hapticRotation.ToEulerAngles().z);
-        laser.transform.localPosition = new Vector3(-hapticPosition.x, hapticPosition.y, -hapticPosition.z);
-        //hapticPosition.x = hapticManager.HandPosition.z;
-        //hapticPosition.z = -hapticManager.HandPosition.x;
-        //laser.transform.localPosition = new Vector3(hapticPosition.z, hapticPosition.y, -hapticPosition.x);
-        //Debug.Log(hapticPosition.x);
+        laser.transform.localPosition = new Vector3(-hapticPosition.x, hapticPosition.y, -hapticPosition.z) * hapticArmMotionCoefficient;
 
-        //Debug.DrawRay(hapticManager.HandPosition, hapticManager.HandRotation.eulerAngles);
-
-        // x devient z et z devient -x
-
+        Debug.DrawRay(laser.transform.position, laser.transform.right * 100);
         if (hapticManager.GetButtonDown(1)) {
-            rayFired = new Ray(laser.transform.position, laser.transform.rotation.eulerAngles);
+            rayFired = new Ray(laser.transform.position, laser.transform.right);
 
             if (Physics.Raycast(rayFired, out raycastHit, raycastRange))
             {
