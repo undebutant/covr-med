@@ -112,7 +112,7 @@ public class HapticManager : MonoBehaviour {
         if (phantom == null || !phantom.IsRunning)
             return false;
 
-        while (!Phantom.IsAvailable) ;
+        while (!phantom.IsAvailable) ;
 
 
         // Exit the use of PHANTOM
@@ -209,7 +209,7 @@ public class HapticManager : MonoBehaviour {
             }
         }
 
-        Phantom.SetForce(force);
+        phantom.SetForce(force);
 
 
         // Test if the button 1 and 2 are pressed
