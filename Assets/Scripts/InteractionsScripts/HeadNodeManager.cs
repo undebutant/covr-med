@@ -6,7 +6,7 @@ public class HeadNodeManager : MonoBehaviour {
 
     GameObject headNode;
 
-    // The VRWand object is need, as it is the only one knowing the player's prefab via the WandSelection script
+    // The VRWand object is needed, as it is the only one knowing the player's prefab via the WandSelection script
     [SerializeField]
     GameObject vrWand;
 
@@ -22,12 +22,12 @@ public class HeadNodeManager : MonoBehaviour {
         while (headNode == null) {
             headNode = GameObject.Find("HeadNode");
         }
+
         wandSelection = vrWand.GetComponent<WandSelection>();
 	}
-	
-	// Update is called once per frame
-	void Update () {
 
+
+	void Update () {
         /*
         // Wait for the WandSelection to find the local prefab player
         if (prefabPlayer == null)
