@@ -43,6 +43,10 @@ public class NetworkAvatarSetup : NetworkBehaviour {
     [Tooltip("The input manager of the player avatar prefab, to set active on creation of the avatar")]
     InputManager playerInputManager;
 
+    public GameObject GetPlayerCamera() {
+        return playerCamera;
+    }
+
 
     private void Start() {
 
