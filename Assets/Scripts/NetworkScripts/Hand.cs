@@ -71,6 +71,7 @@ public class Hand : NetworkBehaviour {
         hand.transform.rotation = newRotation;
     }
 
+
     void Start() {
         horizontalAngle = 0f;
         verticalAngle = 0f;
@@ -120,7 +121,7 @@ public class Hand : NetworkBehaviour {
                             }
                         }
                     }
-                    // Using haptic arm
+                // Using haptic arm
                 } else {
                     // Move the GameObject according to the haptic arm
                     hand.transform.localPosition = hapticManager.HandPosition;

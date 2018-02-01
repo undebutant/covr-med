@@ -85,7 +85,8 @@ public class SyncPlayerTransform : NetworkBehaviour {
     private void CmdProvidePositionToServer(Vector3 positionReceived, Quaternion rotationReceived, Vector3 newHandPosition, Quaternion newHandRotation) {
         // Update target for the avatar position and rotation
         targetPosition = positionReceived;
-        targetRotation = new Quaternion(0, rotationReceived.y, 0, rotationReceived.w);  // Cancelling rotation on x and z axis to prevent weird moves of the avatar
+        targetRotation = new Quaternion(0, rotationReceived.y, 0, rotationReceived.w);      // Cancelling rotation on x and z axis to prevent weird moves of the avatar
+
         // Update target for the hand position and rotation
         handPosition = newHandPosition;
         handRotation = newHandRotation;
