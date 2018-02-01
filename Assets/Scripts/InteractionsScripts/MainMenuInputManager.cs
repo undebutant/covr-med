@@ -58,10 +58,31 @@ public class MainMenuInputManager : MonoBehaviour {
 
 
     void HandleHapticInputs() {
+
+        // Handle the laser's position
         Vector3 hapticPosition = hapticManager.HandPosition;
-        hapticPosition.z = hapticManager.HandPosition.x;
-        hapticPosition.x = hapticManager.HandPosition.z;
-        laser.transform.position = hapticPosition;
+
+        // Handle the laser's rotation
+        Quaternion hapticRotation = hapticManager.HandRotation;
+
+        laser.transform.localRotation = Quaternion.EulerAngles(0, hapticRotation.ToEulerAngles().y, -hapticRotation.ToEulerAngles().z);
+        //hapticPosition.x = hapticManager.HandPosition.z;
+        //hapticPosition.z = -hapticManager.HandPosition.x;
+        //laser.transform.localPosition = new Vector3(hapticPosition.z, hapticPosition.y, -hapticPosition.x);
+        //Debug.Log(hapticPosition.x);
+
+        //Debug.DrawRay(hapticManager.HandPosition, hapticManager.HandRotation.eulerAngles);
+
+        // x devient z et z devient -x
+
+        if (hapticManager.GetButtonDown(1)) {
+            rayFired = new Ray(laser.transform.position, laser.transform.rotation.eulerAngles);
+
+            if (Physics.Raycast(rayFired, out raycastHit, raycastRange))
+            {
+                mainMenuManager.OnHitButton(raycastHit.collider.gameObject);
+            }
+        }
     }
 
 
