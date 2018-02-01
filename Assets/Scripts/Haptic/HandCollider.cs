@@ -7,6 +7,9 @@ public class HandCollider : MonoBehaviour {
     [SerializeField]
     Hand handScript;
 
+    SoundManager soundManager;
+
+
     // Stock the height of the last tissue encountered in collision
     float lastTissueY;
 
@@ -68,6 +71,9 @@ public class HandCollider : MonoBehaviour {
 
         lastTableY = 0;
         lastTissueY = 0;
+
+        soundManager = GameObject.FindObjectOfType<SoundManager>();
+
     }
 
 
@@ -76,6 +82,10 @@ public class HandCollider : MonoBehaviour {
         if (other.gameObject.layer == layerSelectable) {
             // ... tell the handScript that he can grab this object
             handScript.ObjectToSelect = other.gameObject;
+
+            // Plays the hover sound 
+            soundManager.PlayHoverSound(new Vector3(0,0,0));
+
         }
 
         // If the object that collides with the hand is a patient object
