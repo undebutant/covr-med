@@ -22,7 +22,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
     Transform selfTransformAvatar;
 
     [SerializeField]
-    [Tooltip("The transform of this specific hand")]
+    [Tooltip("The transform of this specific hand of the prefab")]
     Transform selfTransformHand;
 
     [SerializeField]
@@ -51,7 +51,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
 
 
     private void FixedUpdate() {
-        // Synchronise the position and rotation only if this avatar is not controlled locally
+        // Synchronise the position and rotation of the avatar and the hand only if this avatar is not controlled locally
         if (!isLocalPlayer) {
             LerpPosition();
             SlerpRotation();
@@ -66,12 +66,14 @@ public class SyncPlayerTransform : NetworkBehaviour {
     private void LerpPosition() {
         // Translate the parent
         selfTransform.position = Vector3.Lerp(selfTransform.position, targetPosition, Time.deltaTime * lerpingTime);
+        // Translate the hand
         selfTransformHand.position = Vector3.Lerp(selfTransformHand.position, handPosition, Time.deltaTime * lerpingTime);
     }
 
     private void SlerpRotation() {
         // Rotate the avatar
         selfTransformAvatar.rotation = Quaternion.Slerp(selfTransformAvatar.rotation, targetRotation, Time.deltaTime * slerpingTime);
+        // Rotate the hand
         selfTransformHand.rotation = Quaternion.Slerp(selfTransformHand.rotation, handRotation, Time.deltaTime * slerpingTime);
     }
 
@@ -81,8 +83,10 @@ public class SyncPlayerTransform : NetworkBehaviour {
     /// </summary>
     [Command]
     private void CmdProvidePositionToServer(Vector3 positionReceived, Quaternion rotationReceived, Vector3 newHandPosition, Quaternion newHandRotation) {
+        // Update target for the avatar position and rotation
         targetPosition = positionReceived;
         targetRotation = new Quaternion(0, rotationReceived.y, 0, rotationReceived.w);  // Cancelling rotation on x and z axis to prevent weird moves of the avatar
+        // Update target for the hand position and rotation
         handPosition = newHandPosition;
         handRotation = newHandRotation;
     }
