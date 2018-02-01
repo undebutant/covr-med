@@ -22,6 +22,10 @@ public class SyncPlayerTransform : NetworkBehaviour {
     Transform selfTransformAvatar;
 
     [SerializeField]
+    [Tooltip("The transform of this specific hand")]
+    Transform selfTransformHand;
+
+    [SerializeField]
     [Tooltip("The time taken to lerp to the final destination")]
     float lerpingTime;
 
@@ -42,17 +46,9 @@ public class SyncPlayerTransform : NetworkBehaviour {
     [SyncVar]
     private Vector3 handPosition;
 
-    private Vector3 handPositionLocalToBeSend;
+    [SyncVar]
+    private Quaternion handRotation;
 
-
-
-    public void UpdateHandPosition(Vector3 newPos) {
-        handPositionLocalToBeSend = newPos;
-    }
-
-    public Vector3 getHandPosition() {
-        return handPosition;
-    }
 
     private void FixedUpdate() {
         // Synchronise the position and rotation only if this avatar is not controlled locally
@@ -70,11 +66,13 @@ public class SyncPlayerTransform : NetworkBehaviour {
     private void LerpPosition() {
         // Translate the parent
         selfTransform.position = Vector3.Lerp(selfTransform.position, targetPosition, Time.deltaTime * lerpingTime);
+        selfTransformHand.position = Vector3.Lerp(selfTransformHand.position, handPosition, Time.deltaTime * lerpingTime);
     }
 
     private void SlerpRotation() {
         // Rotate the avatar
         selfTransformAvatar.rotation = Quaternion.Slerp(selfTransformAvatar.rotation, targetRotation, Time.deltaTime * slerpingTime);
+        selfTransformHand.rotation = Quaternion.Slerp(selfTransformHand.rotation, handRotation, Time.deltaTime * slerpingTime);
     }
 
 
@@ -82,10 +80,11 @@ public class SyncPlayerTransform : NetworkBehaviour {
     ///     The method called on the client side, used to push the new target position and target rotation to the server
     /// </summary>
     [Command]
-    private void CmdProvidePositionToServer(Vector3 positionReceived, Quaternion rotationReceived, Vector3 newHandPosition) {
+    private void CmdProvidePositionToServer(Vector3 positionReceived, Quaternion rotationReceived, Vector3 newHandPosition, Quaternion newHandRotation) {
         targetPosition = positionReceived;
         targetRotation = new Quaternion(0, rotationReceived.y, 0, rotationReceived.w);  // Cancelling rotation on x and z axis to prevent weird moves of the avatar
         handPosition = newHandPosition;
+        handRotation = newHandRotation;
     }
 
     /// <summary>
@@ -95,7 +94,7 @@ public class SyncPlayerTransform : NetworkBehaviour {
     private void TransmitPositionToServer() {
         if (isLocalPlayer) {
             // Calling the command to synchronise the transform (position of the parent and the rotation of the camera)
-            CmdProvidePositionToServer(selfTransform.position, selfTransformCamera.rotation, handPositionLocalToBeSend);
+            CmdProvidePositionToServer(selfTransform.position, selfTransformCamera.rotation, selfTransformHand.position, selfTransformHand.rotation);
         }
     }
 }
