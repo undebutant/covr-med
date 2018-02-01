@@ -7,12 +7,17 @@ public class MainMenuInputManager : MonoBehaviour {
     [SerializeField]
     MainMenuManager mainMenuManager;
 
-    [SerializeField]
     ConfigInitializer configInitializer;
 
     [SerializeField]
+    HapticManager hapticManager;
+
+    [SerializeField]
     [Tooltip("The valid range for the raycast")]
-    float raycastRange;
+    float raycastRange = 100.0f;
+
+    [SerializeField]
+    GameObject laser;
 
 
     // The raycast used for selection
@@ -53,7 +58,10 @@ public class MainMenuInputManager : MonoBehaviour {
 
 
     void HandleHapticInputs() {
-        // TODO
+        Vector3 hapticPosition = hapticManager.HandPosition;
+        hapticPosition.z = hapticManager.HandPosition.x;
+        hapticPosition.x = hapticManager.HandPosition.z;
+        laser.transform.position = hapticPosition;
     }
 
 
