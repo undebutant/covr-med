@@ -66,6 +66,7 @@ public class MainMenuInputManager : MonoBehaviour {
         Quaternion hapticRotation = hapticManager.HandRotation;
 
         laser.transform.localRotation = Quaternion.EulerAngles(0, hapticRotation.ToEulerAngles().y, -hapticRotation.ToEulerAngles().z);
+        laser.transform.localPosition = new Vector3(-hapticPosition.x, hapticPosition.y, -hapticPosition.z);
         //hapticPosition.x = hapticManager.HandPosition.z;
         //hapticPosition.z = -hapticManager.HandPosition.x;
         //laser.transform.localPosition = new Vector3(hapticPosition.z, hapticPosition.y, -hapticPosition.x);
