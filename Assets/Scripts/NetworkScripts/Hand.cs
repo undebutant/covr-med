@@ -72,9 +72,8 @@ public class Hand : NetworkBehaviour {
     public void SetHandTransform(Vector3 newPosition, Quaternion newRotation) {
         hand.transform.position = newPosition;
         hand.transform.rotation = newRotation;
-
-        syncPlayerTransform.UpdateHandPosition(hand.transform.position);
     }
+
 
     void Start() {
         horizontalAngle = 0f;
@@ -111,7 +110,6 @@ public class Hand : NetworkBehaviour {
                     //TODO WARNING, use the value angleHorizontal to move verticaly to fix a bug
 
                     hand.transform.position = newpos;
-                    syncPlayerTransform.UpdateHandPosition(hand.transform.position);
 
                     if (Input.GetButtonDown("Fire1")) {
                         if (objectDrag.GetIsDragFeatureOn()) {
@@ -133,7 +131,7 @@ public class Hand : NetworkBehaviour {
                             }
                         }
                     }
-                    // Using haptic arm
+                // Using haptic arm
                 } else {
                     // Move the GameObject according to the haptic arm
                     hand.transform.localPosition = hapticManager.HandPosition;
@@ -141,8 +139,6 @@ public class Hand : NetworkBehaviour {
                     // Rotate the GameObject according to the haptic arm
                     hand.transform.localRotation = hapticManager.HandRotation;
 
-                    // Sending it through the network
-                    syncPlayerTransform.UpdateHandPosition(hand.transform.position);
 
                     // Test if the button1 of the haptic controller is 
                     if (hapticManager.GetButtonDown(1)) {
@@ -179,9 +175,6 @@ public class Hand : NetworkBehaviour {
                     }
                 }
             }
-        // The player is not local, hence we just apply the updated position of the other avatar's hand ingame
-        } else {
-            hand.transform.position = syncPlayerTransform.getHandPosition();
         }
     }
 }
