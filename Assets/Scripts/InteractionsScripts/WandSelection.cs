@@ -15,6 +15,9 @@ public class WandSelection : MonoBehaviour {
     private string buttonObjectsLayerName = "Button";
 
     [SerializeField]
+    private string dropZoneTag = "Zone";
+
+    [SerializeField]
     MainMenuManager mainMenuManager;
 
     [SerializeField]
@@ -25,14 +28,20 @@ public class WandSelection : MonoBehaviour {
 
     bool isClicked = false;
 
+    bool isObjectSelected = false;
+    GameObject selectedObject;
+
     // Prefab of the local player
-    GameObject prefabPlayer;
+    public GameObject prefabPlayer;
 
     // The remote position
     GameObject wand;
 
     // The hand script of the local player avatar prefab
     Hand avatarsHand;
+
+    // Object drag's script of the prefab player
+    ObjectDrag objectDrag;
 
 
     /// <summary>
@@ -60,6 +69,8 @@ public class WandSelection : MonoBehaviour {
         }
         avatarsHand = prefabPlayer.GetComponent<Hand>();
 
+        objectDrag = prefabPlayer.GetComponentInChildren<ObjectDrag>();
+
         yield return null;
     }
 
@@ -81,6 +92,7 @@ public class WandSelection : MonoBehaviour {
 
         selectableObjectsLayer =  LayerMask.NameToLayer(selectableObjectsLayerName);
         buttonObjectsLayer = LayerMask.NameToLayer(buttonObjectsLayerName);
+        selectedObject = null;
 
         // Looking for the local player prefab avatar
         if (SceneManager.GetActiveScene().name == mainSceneName) {
@@ -100,15 +112,23 @@ public class WandSelection : MonoBehaviour {
         if (MiddleVR.VRDeviceMgr != null) {
             // Getting state of primary wand button
             bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
-
             // The laser forward raycast
-            if (Physics.Raycast(transform.position, laserForward, out hit)) {
+            Debug.DrawRay(transform.position, laserForward);
+            if (Physics.Raycast(transform.position, laserForward , out hit)) {
+
+                // Select an object to drag and drop
                 if (hit.collider.gameObject.layer == selectableObjectsLayer) {
                     // Set the color of the wand's ray
                     GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
-                    if (isWandButtonPressed0) {
-                        // TODO call the drag and drop
+                    if (isWandButtonPressed0 && !isClicked) {
+                        isClicked = true;
+                        isObjectSelected = true;
+                        selectedObject = hit.collider.gameObject;
+                        Debug.LogError(avatarsHand.name);
+                        objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
                     }
+
+                    // Click on a menu's button
                 } else if (hit.collider.gameObject.layer == buttonObjectsLayer) {
                     // Set the color of the wand's ray
                     GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
@@ -117,12 +137,20 @@ public class WandSelection : MonoBehaviour {
                         isClicked = true;
                         mainMenuManager.OnHitButton(hit.collider.gameObject);
                     }
+
+                    // Release object
+                } else if (hit.collider.gameObject.tag == dropZoneTag) {
+                    if (isWandButtonPressed0 && !isClicked) {
+                        isClicked = true;
+                        isObjectSelected = false;
+                        selectedObject = null;
+                        objectDrag.ReleaseObject();
+                    }
                 }
             }
+            if (!isWandButtonPressed0)
+                isClicked = false;
         }
-
-        if (!isWandButtonPressed0)
-            isClicked = false;
     }
     */
 }
