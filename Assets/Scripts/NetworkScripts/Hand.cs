@@ -39,6 +39,9 @@ public class Hand : NetworkBehaviour {
 
     GameObject objectToSelect;
 
+    SoundManager soundManager;
+    
+
     // The int value of the layer mask "Selectable"
     int layerSelectable;
 
@@ -81,6 +84,11 @@ public class Hand : NetworkBehaviour {
         layerSelectable = LayerMask.NameToLayer("Selectable");
 
         config = GameObject.FindObjectOfType<ConfigInitializer>();
+
+        soundManager = GameObject.FindObjectOfType<SoundManager>();
+        
+
+
     }
 
 
@@ -111,12 +119,14 @@ public class Hand : NetworkBehaviour {
                             Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(hand.transform.position));
 
                             RaycastHit shootHit;
-
+                       
                             // Whenever the rayCast hits something...
                             if (Physics.Raycast(ray, out shootHit, 1000)) {
                                 // ... matching the layer
                                 if (shootHit.collider.gameObject.layer == layerSelectable) {
                                     objectDrag.SelectObject(hand, shootHit.collider.gameObject, 0f);
+
+                                
                                 }
                             }
                         }
@@ -137,6 +147,10 @@ public class Hand : NetworkBehaviour {
                             if (!handColliderScript.GetIsContactTable() && !handColliderScript.GetIsContactTissue()) {
                                 //... release the object
                                 objectDrag.ReleaseObject();
+
+                                // Playing the selection sound effect
+                                soundManager.PlayDropSound(hand.transform.position);
+
                                 // Reactivate the hand and tell the haptic manager that a syringe is not selected
                                 hapticManager.ReleaseSyringe();
                                 handMesh.SetActive(true);
@@ -144,9 +158,13 @@ public class Hand : NetworkBehaviour {
                         //If an object can be selected ...
                         } else {
                             if (objectToSelect != null) {
+
+                                // Playing the selection sound effect
+                                soundManager.PlaySelectionSound(hand.transform.position);
+
                                 // ... start dragging the object
                                 objectDrag.SelectObject(hand, objectToSelect, 0f);
-
+                              
                                 // When the object selected is a syringe, make the hand disappear and tell the haptic manager that a syringe is selected
                                 if (objectToSelect.CompareTag("Syringe")) {
                                     hapticManager.SelectSyringe();

@@ -25,6 +25,8 @@ public class WandSelection : MonoBehaviour {
 
     bool isClicked = false;
 
+    bool isHoveringSelectableObject = false;
+
     bool isObjectSelected = false;
     GameObject selectedObject;
 
@@ -39,6 +41,8 @@ public class WandSelection : MonoBehaviour {
 
     // Object drag's script of the prefab player
     ObjectDrag objectDrag;
+
+    SoundManager soundManager;
 
 
     /// <summary>
@@ -95,6 +99,8 @@ public class WandSelection : MonoBehaviour {
         if (SceneManager.GetActiveScene().name == mainSceneName) {
             StartCoroutine(FindPrefabPlayer());
         }
+
+        soundManager = GameObject.FindObjectOfType<SoundManager>();
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
@@ -116,11 +122,21 @@ public class WandSelection : MonoBehaviour {
                 if (hit.collider.gameObject.layer == selectableObjectsLayer) {
                     // Set the color of the wand's ray
                     GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
+
+                    // Plays the hover sound 
+                    if(!isHoveringSelectableObject)
+                        soundManager.PlayHoverSound(new Vector3(0, 0, 0));
+
+                    isHoveringSelectableObject = true;
+
                     if (isWandButtonPressed0 && !isClicked) {
                         isClicked = true;
                         isObjectSelected = true;
                         selectedObject = hit.collider.gameObject;
                         objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
+
+                        // Playing the selection sound effect
+                        soundManager.PlaySelectionSound(hit.collider.gameObject.transform.position);
                     }
 
                     // Click on a menu's button
@@ -134,14 +150,19 @@ public class WandSelection : MonoBehaviour {
                     }
 
                     // Release object
-                } else if (hit.collider.gameObject.tag == dropZoneTag) {
-                    if (isWandButtonPressed0 && !isClicked) {
+                } else if (isWandButtonPressed0 && !isClicked && isObjectSelected) {
                         isClicked = true;
                         isObjectSelected = false;
                         selectedObject = null;
                         objectDrag.ReleaseObject();
-                    }
+
+                        // Playing the selection sound effect
+                        soundManager.PlayDropSound(hit.collider.gameObject.transform.position);
                 }
+
+                // Set isHoveringSelectableObject to false if not hovering
+                if (hit.collider.gameObject.layer != selectableObjectsLayer && !isObjectSelected)
+                    isHoveringSelectableObject = false;
             }
             if (!isWandButtonPressed0)
                 isClicked = false;
