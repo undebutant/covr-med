@@ -60,7 +60,7 @@ public class ObjectDrag : MonoBehaviour {
         } else {
             isDragFeatureOn = false;
 
-            throw new Exception("Bas device Selector or bad object to select");
+            throw new Exception("Bad device Selector or bad object to select");
         }
     }
 
@@ -68,7 +68,7 @@ public class ObjectDrag : MonoBehaviour {
     // The function called each frame to move the object
     void MoveObject() {
         if (isDragFeatureOn) {
-            Vector3 newPos = deviceSelector.transform.position;
+            Vector3 newPos = deviceSelector.transform.position + deviceSelector.transform.forward * this.distance;
             Quaternion newRot = deviceSelector.transform.rotation;
 
             // If the selected object is a syringe, we apply a 180°C rotation on the Z axis, otherwise the syringe would be upside down
