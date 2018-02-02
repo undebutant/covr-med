@@ -15,9 +15,6 @@ public class WandSelection : MonoBehaviour {
     private string buttonObjectsLayerName = "Button";
 
     [SerializeField]
-    private string dropZoneTag = "Zone";
-
-    [SerializeField]
     MainMenuManager mainMenuManager;
 
     [SerializeField]
@@ -113,7 +110,6 @@ public class WandSelection : MonoBehaviour {
             // Getting state of primary wand button
             bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
             // The laser forward raycast
-            Debug.DrawRay(transform.position, laserForward);
             if (Physics.Raycast(transform.position, laserForward , out hit)) {
 
                 // Select an object to drag and drop
@@ -124,7 +120,6 @@ public class WandSelection : MonoBehaviour {
                         isClicked = true;
                         isObjectSelected = true;
                         selectedObject = hit.collider.gameObject;
-                        Debug.LogError(avatarsHand.name);
                         objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
                     }
 
