@@ -44,6 +44,12 @@ public class ConnectionManager : MonoBehaviour {
     }
 
 
+    public bool Disconnect() {
+        networkManager.StopHost();
+
+        return true;
+    }
+
     public bool StartAsHost() {
         try {
             UpdateNetworkManager();

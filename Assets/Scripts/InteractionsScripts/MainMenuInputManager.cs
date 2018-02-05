@@ -22,6 +22,8 @@ public class MainMenuInputManager : MonoBehaviour {
     [SerializeField]
     float hapticArmMotionCoefficient = 5.0f;
 
+    PhantomManager phantomManager;
+
 
     // The raycast used for selection
     Ray rayFired;
@@ -30,6 +32,7 @@ public class MainMenuInputManager : MonoBehaviour {
 
     private void Start() {
         configInitializer = FindObjectOfType<ConfigInitializer>();
+        phantomManager = GameObject.FindObjectOfType<PhantomManager>();
     }
 
 
@@ -48,6 +51,11 @@ public class MainMenuInputManager : MonoBehaviour {
                 Debug.LogError("Input device not recognised in the MainMenuInputManager script");
                 Application.Quit();
                 break;
+        }
+
+        if (Input.GetButtonDown("Cancel")) {
+            phantomManager.StopHaptics();
+            Application.Quit();
         }
 
         // Mouse compatibility if needed

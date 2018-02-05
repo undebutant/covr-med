@@ -80,11 +80,22 @@ public class HapticManager : MonoBehaviour {
         // Initialize variables
         Init();
 
-        phantom = new SimplePhantomUnity();    
+        PhantomManager phantomManager = GameObject.FindObjectOfType<PhantomManager>();
+        Debug.LogError(phantomManager);
+        phantom = phantomManager.GetPhantom();
+        Debug.LogError(phantom);
+        Debug.LogError(phantom.IsAvailable);
         phantom.AddSchedule(PhantomUpdate, Hd.Priority.HD_RENDER_EFFECT_FORCE_PRIORITY);
         phantom.Start();
 
         return true;
+    }
+
+    // Process when disabling the application
+    private void OnDisable() {
+        phantom.Stop();
+        phantom.ClearSchedule();
+        
     }
 
 
@@ -97,33 +108,10 @@ public class HapticManager : MonoBehaviour {
     }
 
 
-    // Process when disabling the application
-    private void OnDisable() {
-        Debug.Log(_tag + "Haptic go out on disable");
-        StopHaptics();
-    }
+    
 
 
-    // Stop device communication
-    public bool StopHaptics() {
-
-        // Bugfix very dirty for the Build Only
-#if UNITY_EDITOR
-        if (phantom == null || !phantom.IsRunning)
-            return false;
-
-        while (!phantom.IsAvailable) ;
-
-
-        // Exit the use of PHANTOM
-        phantom.Close();
-        phantom = null;
-#else
-        System.Diagnostics.Process.GetCurrentProcess().Kill();
-#endif
-
-        return true;
-    }
+    
 
 
     void Start () {
@@ -143,6 +131,7 @@ public class HapticManager : MonoBehaviour {
 
     // Function to be executed asynchronously from the haptic device
     private bool PhantomUpdate() {
+
         // Downscaling the movement range in Unity app for the user
         Vector3 haptPosition = phantom.GetPosition() / downScale;
 

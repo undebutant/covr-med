@@ -1,6 +1,7 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
+using System;
 
 
 public class InputManager : NetworkBehaviour {
@@ -32,9 +33,18 @@ public class InputManager : NetworkBehaviour {
     // The config for the local instance
     ConfigInitializer config;
 
+    NetworkManager networkManager;
 
     private void Start() {
         config = GameObject.FindObjectOfType<ConfigInitializer>();
+        try {
+            networkManager = GameObject.FindObjectOfType<NetworkManager>();
+            Debug.LogError("OK");
+            Debug.LogError(networkManager);
+        } catch (Exception exception) {
+            Debug.LogError("Error while looking for the NetworkManager. Exception raised : " + exception);
+            Application.Quit();
+        }
     }
 
 
@@ -81,6 +91,12 @@ public class InputManager : NetworkBehaviour {
             // TODO use network menu to chose role
             if (!isServer) {
                 movePlayer(new Vector3(xMove, yMove, zMove) * speed);
+            }
+
+
+            if(Input.GetButtonDown("Cancel")) {
+                Debug.LogError(networkManager);
+                networkManager.StopHost();
             }
         }
     }
