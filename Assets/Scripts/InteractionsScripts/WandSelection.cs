@@ -20,6 +20,8 @@ public class WandSelection : MonoBehaviour {
     [SerializeField]
     string mainSceneName = "OR_Room";
 
+    GameObject systemCenterNode;
+
     int selectableObjectsLayer;
     int buttonObjectsLayer;
 
@@ -43,6 +45,7 @@ public class WandSelection : MonoBehaviour {
     ObjectDrag objectDrag;
 
     SoundManager soundManager;
+    ZonesNavigation zonesNavigation;
 
 
     /// <summary>
@@ -69,8 +72,8 @@ public class WandSelection : MonoBehaviour {
                 yield return new WaitForSeconds(1);
         }
         avatarsHand = prefabPlayer.GetComponent<Hand>();
-
         objectDrag = prefabPlayer.GetComponentInChildren<ObjectDrag>();
+        zonesNavigation = prefabPlayer.GetComponent<ZonesNavigation>();
 
         yield return null;
     }
@@ -101,6 +104,9 @@ public class WandSelection : MonoBehaviour {
         }
 
         soundManager = GameObject.FindObjectOfType<SoundManager>();
+
+        // Initialize system center node
+        systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
@@ -163,6 +169,13 @@ public class WandSelection : MonoBehaviour {
                 // Set isHoveringSelectableObject to false if not hovering
                 if (hit.collider.gameObject.layer != selectableObjectsLayer && !isObjectSelected)
                     isHoveringSelectableObject = false;
+
+                // If a navigation zone was selected
+                if (hit.collider.gameObject.tag == "NavigationZone") {
+                    GameObject zone = hit.collider.gameObject;
+                    if (isWandButtonPressed0 && !isClicked)
+                        systemCenterNode.transform.position = new Vector3(zone.transform.position.x, systemCenterNode.transform.position.y, zone.transform.position.z);
+                }
             }
             if (!isWandButtonPressed0)
                 isClicked = false;
