@@ -79,20 +79,18 @@ public class HapticManager : MonoBehaviour {
     public bool InitHaptics() {
         // Initialize variables
         Init();
-
+        // This script just get the phantom that is already existing from the PhantomManager ...
         PhantomManager phantomManager = GameObject.FindObjectOfType<PhantomManager>();
-        Debug.LogError(phantomManager);
         phantom = phantomManager.GetPhantom();
-        Debug.LogError(phantom);
-        Debug.LogError(phantom.IsAvailable);
+        // ... and add his function to it
         phantom.AddSchedule(PhantomUpdate, Hd.Priority.HD_RENDER_EFFECT_FORCE_PRIORITY);
         phantom.Start();
-
         return true;
     }
 
     // Process when disabling the application
     private void OnDisable() {
+        // Clear the phantom for the next script that will use the phantom
         phantom.Stop();
         phantom.ClearSchedule();
         

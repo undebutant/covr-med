@@ -39,8 +39,6 @@ public class InputManager : NetworkBehaviour {
         config = GameObject.FindObjectOfType<ConfigInitializer>();
         try {
             networkManager = GameObject.FindObjectOfType<NetworkManager>();
-            Debug.LogError("OK");
-            Debug.LogError(networkManager);
         } catch (Exception exception) {
             Debug.LogError("Error while looking for the NetworkManager. Exception raised : " + exception);
             Application.Quit();
@@ -93,11 +91,13 @@ public class InputManager : NetworkBehaviour {
                 movePlayer(new Vector3(xMove, yMove, zMove) * speed);
             }
 
-
+            // Button Echap for disconnecting from the current session
             if(Input.GetButtonDown("Cancel")) {
                 if(isServer) {
+                    // If we are the host we use the StopHost function
                     networkManager.StopHost();
                 } else {
+                    // If we are just a clien we use the StopClient function
                     networkManager.StopClient();
                 }
                 

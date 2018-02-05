@@ -53,6 +53,7 @@ public class MainMenuInputManager : MonoBehaviour {
                 break;
         }
 
+        // Echap on the main menu will close the app
         if (Input.GetButtonDown("Cancel")) {
             phantomManager.StopHaptics();
             Application.Quit();

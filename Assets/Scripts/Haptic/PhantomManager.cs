@@ -4,13 +4,15 @@ using UnityEngine;
 using ManagedPhantom;
 
 public class PhantomManager : MonoBehaviour {
-
+    // This script is use for making the SimplePhantomUnity a singleton
+    // Because when the haptic is use in two differents scenes, the phantom have troubles to initialized twice
+    // in the same Build
     public static PhantomManager singletonInstance;
 
     private SimplePhantomUnity phantom = null;
 
     void Start() {
-        // Initialize variables
+        // Initialize the SimplePhantomUnity
 
         phantom = new SimplePhantomUnity();
     }

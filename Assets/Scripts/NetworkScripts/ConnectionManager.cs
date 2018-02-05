@@ -12,8 +12,8 @@ public class ConnectionManager : MonoBehaviour {
     /// <summary>
     ///     The NetworkManager component to use for hosting and clients
     /// </summary>
-    [SerializeField]
-    public static NetworkManager networkManager;
+    
+    NetworkManager networkManager;
 
     /// <summary>
     ///     The ConfigInitializer component containing all the global setup variables
@@ -21,11 +21,11 @@ public class ConnectionManager : MonoBehaviour {
     ConfigInitializer configInitializer;
 
 
-    float test;
+
 
     void Awake() {
 
-
+        // Searching for the config and networkmanager Scripts
         try {
             configInitializer = FindObjectOfType<ConfigInitializer>();
         } catch (Exception exception) {
@@ -38,7 +38,7 @@ public class ConnectionManager : MonoBehaviour {
             Debug.LogError("Error while looking for the NetworkManager. Exception raised : " + exception);
             Application.Quit();
         }
-        test = UnityEngine.Random.value;
+
 
 
     }
@@ -50,35 +50,10 @@ public class ConnectionManager : MonoBehaviour {
     }
 
 
-    public bool Disconnect() {
-        try {
-
-            Debug.LogError("ClientDisconnecting");
-            networkManager.StopClient();
-            Debug.LogError(test);
-            /*
-            if (isHost) {
-                Debug.LogError("ServerDisconnecting");
-                networkManager.StopServer();
-            }*/
-            Destroy(gameObject);
-            
-            
-            return true;
-        } catch (Exception exception) {
-            Debug.LogError("Error while stopping application as host. Exception raised : " + exception);
-            return false;
-        }
-    }
-
     public bool StartAsHost() {
-        /*
-        if (networkManager == null) {
-            networkManager = GameObject.FindObjectOfType<NetworkManager>();
-            Debug.LogError("networkNull");
-        }*/
         
         try {
+            // Use the IP and Port from the Json for the NetworkManager
             UpdateNetworkManager();
             networkManager.StartHost();
             return true;
@@ -91,13 +66,10 @@ public class ConnectionManager : MonoBehaviour {
 
 
     public bool StartAsClient() {
-        if (networkManager == null) {
-            networkManager = GameObject.FindObjectOfType<NetworkManager>();
-        }
 
         try {
+            // Use the IP and Port from the Json for the NetworkManager
             UpdateNetworkManager();
-
             networkManager.StartClient();
             return true;
         }
