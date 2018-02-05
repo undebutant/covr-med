@@ -72,6 +72,10 @@ public class WandSelection : MonoBehaviour {
 
         objectDrag = prefabPlayer.GetComponentInChildren<ObjectDrag>();
 
+        // Do not show the hand's mesh
+        // Find the hand's mesh
+        avatarsHand.GetHandMesh().SetActive(false);
+
         yield return null;
     }
 
