@@ -95,8 +95,12 @@ public class InputManager : NetworkBehaviour {
 
 
             if(Input.GetButtonDown("Cancel")) {
-                Debug.LogError(networkManager);
-                networkManager.StopHost();
+                if(isServer) {
+                    networkManager.StopHost();
+                } else {
+                    networkManager.StopClient();
+                }
+                
             }
         }
     }
