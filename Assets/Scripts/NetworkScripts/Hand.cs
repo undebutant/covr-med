@@ -74,6 +74,13 @@ public class Hand : NetworkBehaviour {
         hand.transform.rotation = newRotation;
     }
 
+    /// <summary>
+    ///     Returns the hand mesh associated to the prefab
+    /// </summary>
+    public GameObject GetHandMesh() {
+        return handMesh;
+    }
+
 
     void Start() {
         horizontalAngle = 0f;
