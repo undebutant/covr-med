@@ -38,7 +38,13 @@ public class ConnectionManager : MonoBehaviour {
             Debug.LogError("Error while looking for the NetworkManager. Exception raised : " + exception);
             Application.Quit();
         }
-
+        // Test if we have been disconnected from the host 
+        if(configInitializer.GetIsConnected()) {
+            Debug.LogError("Lost connection from the host");
+            // In this case, a popup will inform the user
+            GameObject.FindObjectOfType<ErrorPopupScript>().NewPopup("Lost connection from the host");
+            configInitializer.SetIsConnected(false);
+        }
 
 
     }
@@ -55,6 +61,7 @@ public class ConnectionManager : MonoBehaviour {
         try {
             // Use the IP and Port from the Json for the NetworkManager
             UpdateNetworkManager();
+            configInitializer.SetIsConnected(true);
             networkManager.StartHost();
             return true;
         }
@@ -70,6 +77,7 @@ public class ConnectionManager : MonoBehaviour {
         try {
             // Use the IP and Port from the Json for the NetworkManager
             UpdateNetworkManager();
+            configInitializer.SetIsConnected(true);
             networkManager.StartClient();
             return true;
         }

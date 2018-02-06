@@ -16,6 +16,10 @@ public class ConfigInitializer : MonoBehaviour {
     /// </summary>
     StartingConfig startingConfig;
 
+    /// <summary>
+    /// Boolean to know if we are connected 
+    /// </summary>
+    bool isConnected;
 
     [SerializeField]
     [Tooltip("The name of the JSON configuration file")]
@@ -67,6 +71,7 @@ public class ConfigInitializer : MonoBehaviour {
 
             SceneManager.LoadScene(mainMenuScene);
         }
+        isConnected = false;
     }
 
 
@@ -115,6 +120,13 @@ public class ConfigInitializer : MonoBehaviour {
         return startingConfig.playerRole;
     }
 
+    public bool GetIsConnected() {
+        return isConnected;
+    }
+
+    public void SetIsConnected(bool value) {
+        isConnected = value;
+    }
 
     public void SetInputDevice (InputDevice newInputDevice) {
         startingConfig.inputDevice = newInputDevice;

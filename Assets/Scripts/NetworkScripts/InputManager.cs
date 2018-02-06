@@ -94,9 +94,11 @@ public class InputManager : NetworkBehaviour {
             if(Input.GetButtonDown("Cancel")) {
                 if(isServer) {
                     // If we are the host we use the StopHost function
+                    config.SetIsConnected(false);
                     networkManager.StopHost();
                 } else {
                     // If we are just a clien we use the StopClient function
+                    config.SetIsConnected(false);
                     networkManager.StopClient();
                 }
                 
