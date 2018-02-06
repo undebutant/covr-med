@@ -88,12 +88,12 @@ public class HapticManager : MonoBehaviour {
         return true;
     }
 
+
     // Process when disabling the application
     private void OnDisable() {
         // Clear the phantom for the next script that will use the phantom
         phantom.Stop();
         phantom.ClearSchedule();
-        
     }
 
 
@@ -104,12 +104,6 @@ public class HapticManager : MonoBehaviour {
         handRotation = Quaternion.identity;
         lastPosition = Vector3.zero;
     }
-
-
-    
-
-
-    
 
 
     void Start () {
@@ -129,7 +123,6 @@ public class HapticManager : MonoBehaviour {
 
     // Function to be executed asynchronously from the haptic device
     private bool PhantomUpdate() {
-
         // Downscaling the movement range in Unity app for the user
         Vector3 haptPosition = phantom.GetPosition() / downScale;
 
