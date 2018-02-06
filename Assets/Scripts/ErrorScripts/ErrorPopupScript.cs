@@ -5,7 +5,7 @@ using UnityEngine.UI;
 
 
 /// <summary>
-/// This script is used for making a popup with a error message
+///     This script is used to display a popup with an error message
 /// </summary>
 public class ErrorPopupScript : MonoBehaviour {
 
@@ -16,25 +16,27 @@ public class ErrorPopupScript : MonoBehaviour {
 
     bool isActiveStart = false;
 
-	// Use this for initialization
-	void Start () {
-        // At the start we desactivate the popup box, unless a popup have been ask during the awakenning process
-        popupGameObject.SetActive(isActiveStart);
 
+	void Start () {
+        // At the start we deactivate the popup box, unless a popup was asked during the awakening process
+        popupGameObject.SetActive(isActiveStart);
     }
 
-    // Function to ask for a popup with a message
+
+    // Function to call to display a popup with an error message
     public void NewPopup(string errorMessage) {
         // Activate the box
         popupGameObject.SetActive(true);
-        // To prevent the Start function from deactivate the box whereas another script ask for a popup
+        // Prevent the Start function from deactivating the display when another script asked for a popup (when loading the main menu)
         isActiveStart = true;
         // Set the error message
         errorText.text = errorMessage;
  
         StartCoroutine(Popup());
     }
-    // A couroutine that wait 5 seconds before deactivate the popup
+
+
+    // A coroutine that waits 5 seconds before deactivating the popup
     IEnumerator Popup() {
         yield return new WaitForSeconds(5);
         popupGameObject.SetActive(false);

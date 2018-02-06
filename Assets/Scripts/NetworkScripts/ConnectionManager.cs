@@ -7,20 +7,15 @@ using System;
 
 public class ConnectionManager : MonoBehaviour {
 
-
-
     /// <summary>
     ///     The NetworkManager component to use for hosting and clients
     /// </summary>
-    
     NetworkManager networkManager;
 
     /// <summary>
     ///     The ConfigInitializer component containing all the global setup variables
     /// </summary>
     ConfigInitializer configInitializer;
-
-
 
 
     void Awake() {
@@ -45,8 +40,6 @@ public class ConnectionManager : MonoBehaviour {
             GameObject.FindObjectOfType<ErrorPopupScript>().NewPopup("Lost connection from the host");
             configInitializer.SetIsConnected(false);
         }
-
-
     }
 
 

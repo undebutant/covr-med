@@ -17,7 +17,7 @@ public class ConfigInitializer : MonoBehaviour {
     StartingConfig startingConfig;
 
     /// <summary>
-    /// Boolean to know if we are connected 
+    ///     Boolean to know if we are connected to a server
     /// </summary>
     bool isConnected;
 
@@ -71,6 +71,7 @@ public class ConfigInitializer : MonoBehaviour {
 
             SceneManager.LoadScene(mainMenuScene);
         }
+
         isConnected = false;
     }
 
