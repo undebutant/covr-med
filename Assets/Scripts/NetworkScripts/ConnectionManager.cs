@@ -7,9 +7,12 @@ using System;
 
 public class ConnectionManager : MonoBehaviour {
 
+
+
     /// <summary>
     ///     The NetworkManager component to use for hosting and clients
     /// </summary>
+    
     NetworkManager networkManager;
 
     /// <summary>
@@ -19,22 +22,25 @@ public class ConnectionManager : MonoBehaviour {
 
 
 
+
     void Awake() {
+
+        // Searching for the config and networkmanager Scripts
         try {
-            networkManager = GetComponent<NetworkManager>();
+            configInitializer = FindObjectOfType<ConfigInitializer>();
+        } catch (Exception exception) {
+            Debug.LogError("Error while looking for the ConfigInitializer. Exception raised : " + exception);
+            Application.Quit();
         }
-        catch (Exception exception) {
+        try {
+            networkManager = GameObject.FindObjectOfType<NetworkManager>();
+        } catch (Exception exception) {
             Debug.LogError("Error while looking for the NetworkManager. Exception raised : " + exception);
             Application.Quit();
         }
 
-        try {
-            configInitializer = FindObjectOfType<ConfigInitializer>();
-        }
-        catch (Exception exception) {
-            Debug.LogError("Error while looking for the ConfigInitializer. Exception raised : " + exception);
-            Application.Quit();
-        }
+
+
     }
 
 
@@ -45,9 +51,10 @@ public class ConnectionManager : MonoBehaviour {
 
 
     public bool StartAsHost() {
+        
         try {
+            // Use the IP and Port from the Json for the NetworkManager
             UpdateNetworkManager();
-
             networkManager.StartHost();
             return true;
         }
@@ -59,9 +66,10 @@ public class ConnectionManager : MonoBehaviour {
 
 
     public bool StartAsClient() {
-        try {
-            UpdateNetworkManager();
 
+        try {
+            // Use the IP and Port from the Json for the NetworkManager
+            UpdateNetworkManager();
             networkManager.StartClient();
             return true;
         }
@@ -70,4 +78,6 @@ public class ConnectionManager : MonoBehaviour {
             return false;
         }
     }
+
+
 }

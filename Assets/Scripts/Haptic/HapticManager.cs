@@ -79,12 +79,21 @@ public class HapticManager : MonoBehaviour {
     public bool InitHaptics() {
         // Initialize variables
         Init();
-
-        phantom = new SimplePhantomUnity();    
+        // This script just get the phantom that is already existing from the PhantomManager ...
+        PhantomManager phantomManager = GameObject.FindObjectOfType<PhantomManager>();
+        phantom = phantomManager.GetPhantom();
+        // ... and add his function to it
         phantom.AddSchedule(PhantomUpdate, Hd.Priority.HD_RENDER_EFFECT_FORCE_PRIORITY);
         phantom.Start();
-
         return true;
+    }
+
+
+    // Process when disabling the application
+    private void OnDisable() {
+        // Clear the phantom for the next script that will use the phantom
+        phantom.Stop();
+        phantom.ClearSchedule();
     }
 
 
@@ -94,35 +103,6 @@ public class HapticManager : MonoBehaviour {
         handPosition = Vector3.zero;
         handRotation = Quaternion.identity;
         lastPosition = Vector3.zero;
-    }
-
-
-    // Process when disabling the application
-    private void OnDisable() {
-        Debug.Log(_tag + "Haptic go out on disable");
-        StopHaptics();
-    }
-
-
-    // Stop device communication
-    public bool StopHaptics() {
-
-        // Bugfix very dirty for the Build Only
-#if UNITY_EDITOR
-        if (phantom == null || !phantom.IsRunning)
-            return false;
-
-        while (!phantom.IsAvailable) ;
-
-
-        // Exit the use of PHANTOM
-        phantom.Close();
-        phantom = null;
-#else
-        System.Diagnostics.Process.GetCurrentProcess().Kill();
-#endif
-
-        return true;
     }
 
 

@@ -1,10 +1,10 @@
 ﻿using UnityEngine;
 using System.Collections;
 using UnityEngine.Networking;
+using System;
 
 
 public class InputManager : NetworkBehaviour {
-    
 
     [Tooltip("Indicates if the player is using a controller")]
     //public bool controllerOn;
@@ -32,9 +32,17 @@ public class InputManager : NetworkBehaviour {
     // The config for the local instance
     ConfigInitializer config;
 
+    NetworkManager networkManager;
+
 
     private void Start() {
         config = GameObject.FindObjectOfType<ConfigInitializer>();
+        try {
+            networkManager = GameObject.FindObjectOfType<NetworkManager>();
+        } catch (Exception exception) {
+            Debug.LogError("Error while looking for the NetworkManager. Exception raised : " + exception);
+            Application.Quit();
+        }
     }
 
 
@@ -67,26 +75,37 @@ public class InputManager : NetworkBehaviour {
             float xMove;
             float zMove;
 
+
             // Calculating movements in the current plan
             xMove = Input.GetAxis("Horizontal") * Mathf.Cos(playerTransformCamera.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Sin(playerTransformCamera.rotation.eulerAngles.y * Mathf.PI / 180);
             zMove = -Input.GetAxis("Horizontal") * Mathf.Sin(playerTransformCamera.rotation.eulerAngles.y * Mathf.PI / 180) + Input.GetAxis("Vertical") * Mathf.Cos(playerTransformCamera.rotation.eulerAngles.y * Mathf.PI / 180);
 
 
             // Applying rotations
-            rotatePlayer(new Vector3(-rotationY, rotationX, 0));
+            RotatePlayer(new Vector3(-rotationY, rotationX, 0));
 
             // Applying movements
-            // No movement if the player is also the server
-            // Hence when the player is the surgeon
-            // TODO use network menu to chose role
-            if (!isServer) {
-                movePlayer(new Vector3(xMove, yMove, zMove) * speed);
+            // No movement if the player is the surgeon
+            if (config.GetPlayerRole() != PlayerRole.Surgeon) {
+                MovePlayer(new Vector3(xMove, yMove, zMove) * speed);
+            }
+
+            // Button Echap for disconnecting from the current session
+            if(Input.GetButtonDown("Cancel")) {
+                if(isServer) {
+                    // If we are the host we use the StopHost function
+                    networkManager.StopHost();
+                } else {
+                    // If we are just a clien we use the StopClient function
+                    networkManager.StopClient();
+                }
+                
             }
         }
     }
 
 
-    void rotatePlayer(Vector3 rotation) {
+    void RotatePlayer(Vector3 rotation) {
         // Cancelling angular velocity on the rotation
         playerRigidbody.angularVelocity = new Vector3(0,0,0);
         // Use the transform because we don't want to use collider for the rotation
@@ -94,7 +113,7 @@ public class InputManager : NetworkBehaviour {
     }
 
 
-    void movePlayer(Vector3 move) {
+    void MovePlayer(Vector3 move) {
         // Use the rigidbody to use collider
         playerRigidbody.velocity = move;
     }
