@@ -3,6 +3,10 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 
+
+/// <summary>
+///     Allow the player to point at a zone and teleport to it
+/// </summary>
 public class ZonesNavigation : NetworkBehaviour {
 
     GameObject prefabPlayer;

@@ -110,7 +110,7 @@ public class WandSelection : MonoBehaviour {
         soundManager = GameObject.FindObjectOfType<SoundManager>();
 
         // Initialize system center node
-        systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
+        //systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
