@@ -125,20 +125,11 @@ public class Hand : NetworkBehaviour {
                         if (objectDrag.GetIsDragFeatureOn()) {
                             objectDrag.ReleaseObject();
                         } else {
-                            // Raycast for the controller only
-                            Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(hand.transform.position));
+                            // Playing the selection sound effect
+                            soundManager.PlaySelectionSound(hand.transform.position);
 
-                            RaycastHit shootHit;
-
-                            // Whenever the rayCast hits something...
-                            if (Physics.Raycast(ray, out shootHit, 1000)) {
-                                // ... matching the layer
-                                if (shootHit.collider.gameObject.layer == layerSelectable) {
-                                    objectDrag.SelectObject(hand, shootHit.collider.gameObject, 0f);
-
-
-                                }
-                            }
+                            // ... start dragging the object
+                            objectDrag.SelectObject(hand, objectToSelect, 0f);
                         }
                     }
                 // Using haptic arm
