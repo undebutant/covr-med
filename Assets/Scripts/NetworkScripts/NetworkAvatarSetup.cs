@@ -43,6 +43,10 @@ public class NetworkAvatarSetup : NetworkBehaviour {
     [Tooltip("The input manager of the player avatar prefab, to set active on creation of the avatar")]
     InputManager playerInputManager;
 
+    [SerializeField]
+    [Tooltip("The haptic manager of the player avatar prefab, to set active on creation of the avatar if haptic input selected")]
+    HapticManager hapticManager;
+
     public GameObject GetPlayerCamera() {
         return playerCamera;
     }
@@ -67,6 +71,11 @@ public class NetworkAvatarSetup : NetworkBehaviour {
 
             // Disabling the player's avatar
             playerAvatar.SetActive(false);
+
+            // Enable haptic manager if haptic input selected
+            if (configInitializer.GetInputDevice() == InputDevice.Haptic) {
+                hapticManager.enabled = true;
+            }
 
             if (isLocalPlayer) {
                 if (playerRole == PlayerRole.Surgeon) {
