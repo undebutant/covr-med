@@ -119,6 +119,13 @@ public class WandSelection : MonoBehaviour {
         // Update the prefab player hand's transform
         UpdatePrefabPlayerHand();
 
+        // Update the selected object's transform
+        if (isObjectSelected && objectDrag != null) {
+            objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
+        } else if (!isObjectSelected && objectDrag != null) {
+            objectDrag.ReleaseObject();
+        }
+
         Vector3 laserForward = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
 
@@ -129,7 +136,7 @@ public class WandSelection : MonoBehaviour {
             if (Physics.Raycast(transform.position, laserForward , out hit)) {
 
                 // Select an object to drag and drop
-                if (hit.collider.gameObject.layer == selectableObjectsLayer) {
+                if (hit.collider.gameObject.layer == selectableObjectsLayer && !isObjectSelected) {
                     // Set the color of the wand's ray
                     GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
 
@@ -143,7 +150,6 @@ public class WandSelection : MonoBehaviour {
                         isClicked = true;
                         isObjectSelected = true;
                         selectedObject = hit.collider.gameObject;
-                        objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
 
                         // Playing the selection sound effect
                         soundManager.PlaySelectionSound(hit.collider.gameObject.transform.position);
@@ -164,7 +170,6 @@ public class WandSelection : MonoBehaviour {
                         isClicked = true;
                         isObjectSelected = false;
                         selectedObject = null;
-                        objectDrag.ReleaseObject();
 
                         // Playing the selection sound effect
                         soundManager.PlayDropSound(hit.collider.gameObject.transform.position);
@@ -177,8 +182,9 @@ public class WandSelection : MonoBehaviour {
                 // If a navigation zone was selected
                 if (hit.collider.gameObject.tag == "NavigationZone") {
                     GameObject zone = hit.collider.gameObject;
-                    if (isWandButtonPressed0 && !isClicked)
-                        systemCenterNode.transform.position = new Vector3(zone.transform.position.x, systemCenterNode.transform.position.y, zone.transform.position.z);
+                    if (isWandButtonPressed0 && !isClicked) { 
+                        systemCenterNode.transform.position = new Vector3(zone.transform.position.x, systemCenterNode.transform.position.y, zone.transform.position.z);                 
+                    }
                 }
             }
             if (!isWandButtonPressed0)
