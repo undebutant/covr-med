@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 // TODO use ifdef maybe ?
-//using MiddleVR_Unity3D;
+// using MiddleVR_Unity3D;
 
 
 public class WandSelection : MonoBehaviour {
@@ -110,7 +110,7 @@ public class WandSelection : MonoBehaviour {
         soundManager = GameObject.FindObjectOfType<SoundManager>();
 
         // Initialize system center node
-        //systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
+        // systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
@@ -122,14 +122,20 @@ public class WandSelection : MonoBehaviour {
         Vector3 laserForward = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
 
+
         if (MiddleVR.VRDeviceMgr != null) {
+
+            // Set the ray color when manipulating an object
+            if(isObjectSelected)
+                GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
+
             // Getting state of primary wand button
             bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
             // The laser forward raycast
             if (Physics.Raycast(transform.position, laserForward , out hit)) {
 
                 // Select an object to drag and drop
-                if (hit.collider.gameObject.layer == selectableObjectsLayer) {
+                if (hit.collider.gameObject.layer == selectableObjectsLayer && !isObjectSelected) {
                     // Set the color of the wand's ray
                     GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
 
@@ -144,7 +150,6 @@ public class WandSelection : MonoBehaviour {
                         isObjectSelected = true;
                         selectedObject = hit.collider.gameObject;
                         objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
-
                         // Playing the selection sound effect
                         soundManager.PlaySelectionSound(hit.collider.gameObject.transform.position);
                     }
@@ -174,11 +179,13 @@ public class WandSelection : MonoBehaviour {
                 if (hit.collider.gameObject.layer != selectableObjectsLayer && !isObjectSelected)
                     isHoveringSelectableObject = false;
 
-                // If a navigation zone was selected
+                // If a navigation zone was selected, a teleportation toward this zone is operated
                 if (hit.collider.gameObject.tag == "NavigationZone") {
                     GameObject zone = hit.collider.gameObject;
-                    if (isWandButtonPressed0 && !isClicked)
-                        systemCenterNode.transform.position = new Vector3(zone.transform.position.x, systemCenterNode.transform.position.y, zone.transform.position.z);
+                    if (isWandButtonPressed0 && !isClicked) {
+                        isClicked = true;
+                        systemCenterNode.transform.position = new Vector3(zone.transform.position.x, systemCenterNode.transform.position.y, zone.transform.position.z);                 
+                    }
                 }
             }
             if (!isWandButtonPressed0)
