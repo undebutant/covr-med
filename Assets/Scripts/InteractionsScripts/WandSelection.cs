@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 // TODO use ifdef maybe ?
-//using MiddleVR_Unity3D;
+// using MiddleVR_Unity3D;
 
 
 public class WandSelection : MonoBehaviour {
@@ -110,7 +110,7 @@ public class WandSelection : MonoBehaviour {
         soundManager = GameObject.FindObjectOfType<SoundManager>();
 
         // Initialize system center node
-        //systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
+        // systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
@@ -121,9 +121,8 @@ public class WandSelection : MonoBehaviour {
 
         // Update the selected object's transform
         if (isObjectSelected && objectDrag != null) {
+            GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
             objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
-        } else if (!isObjectSelected && objectDrag != null) {
-            objectDrag.ReleaseObject();
         }
 
         Vector3 laserForward = transform.TransformDirection(Vector3.forward);
@@ -170,6 +169,7 @@ public class WandSelection : MonoBehaviour {
                         isClicked = true;
                         isObjectSelected = false;
                         selectedObject = null;
+                        objectDrag.ReleaseObject();
 
                         // Playing the selection sound effect
                         soundManager.PlayDropSound(hit.collider.gameObject.transform.position);
