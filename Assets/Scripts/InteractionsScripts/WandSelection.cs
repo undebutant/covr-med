@@ -184,7 +184,6 @@ public class WandSelection : MonoBehaviour {
                     GameObject zone = hit.collider.gameObject;
                     if (isWandButtonPressed0 && !isClicked) {
                         isClicked = true;
-                        Debug.LogError("Teleportation");
                         systemCenterNode.transform.position = new Vector3(zone.transform.position.x, systemCenterNode.transform.position.y, zone.transform.position.z);                 
                     }
                 }
