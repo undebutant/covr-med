@@ -63,8 +63,11 @@ public class NetworkAvatarSetup : NetworkBehaviour {
             // Enabling the avatar's camera
             playerCamera.SetActive(true);
 
-            // Enabling the player's collider
-            playerCollider.enabled = true;
+            // Enabling the player's collider if we are not in the cave
+            if (configInitializer.GetDisplayDevice() != DisplayDevice.Cave) {
+                playerCollider.enabled = true;
+            }
+            
 
             // Enabling the player's input manager
             playerInputManager.enabled = true;
