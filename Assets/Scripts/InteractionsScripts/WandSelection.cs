@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 // TODO use ifdef maybe ?
-//using MiddleVR_Unity3D;
+// using MiddleVR_Unity3D;
 
 
 public class WandSelection : MonoBehaviour {
@@ -179,10 +179,12 @@ public class WandSelection : MonoBehaviour {
                 if (hit.collider.gameObject.layer != selectableObjectsLayer && !isObjectSelected)
                     isHoveringSelectableObject = false;
 
-                // If a navigation zone was selected
+                // If a navigation zone was selected, a teleportation toward this zone is operated
                 if (hit.collider.gameObject.tag == "NavigationZone") {
                     GameObject zone = hit.collider.gameObject;
-                    if (isWandButtonPressed0 && !isClicked) { 
+                    if (isWandButtonPressed0 && !isClicked) {
+                        isClicked = true;
+                        Debug.LogError("Teleportation");
                         systemCenterNode.transform.position = new Vector3(zone.transform.position.x, systemCenterNode.transform.position.y, zone.transform.position.z);                 
                     }
                 }
@@ -191,5 +193,5 @@ public class WandSelection : MonoBehaviour {
                 isClicked = false;
         }
     }
-     */
+    */
 }
