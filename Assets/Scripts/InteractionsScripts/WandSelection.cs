@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 // TODO use ifdef maybe ?
-// using MiddleVR_Unity3D;
+using MiddleVR_Unity3D;
 
 
 public class WandSelection : MonoBehaviour {
@@ -114,21 +114,21 @@ public class WandSelection : MonoBehaviour {
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
-    /*
+    
     void Update () {
         // Update the prefab player hand's transform
         UpdatePrefabPlayerHand();
 
-        // Update the selected object's transform
-        if (isObjectSelected && objectDrag != null) {
-            GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
-            objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
-        }
-
         Vector3 laserForward = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
 
+
         if (MiddleVR.VRDeviceMgr != null) {
+
+            // Set the ray color when manipulating an object
+            if(isObjectSelected)
+                GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
+
             // Getting state of primary wand button
             bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
             // The laser forward raycast
@@ -149,7 +149,7 @@ public class WandSelection : MonoBehaviour {
                         isClicked = true;
                         isObjectSelected = true;
                         selectedObject = hit.collider.gameObject;
-
+                        objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
                         // Playing the selection sound effect
                         soundManager.PlaySelectionSound(hit.collider.gameObject.transform.position);
                     }
@@ -191,5 +191,5 @@ public class WandSelection : MonoBehaviour {
                 isClicked = false;
         }
     }
-    */
+     
 }
