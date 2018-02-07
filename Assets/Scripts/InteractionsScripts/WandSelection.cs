@@ -2,8 +2,14 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
+using CHSF;
 // TODO use ifdef maybe ?
-// using MiddleVR_Unity3D;
+//using MiddleVR_Unity3D;
+
+enum SelectionState {
+    Ray,
+    Hand,
+}
 
 
 public class WandSelection : MonoBehaviour {
@@ -20,12 +26,19 @@ public class WandSelection : MonoBehaviour {
     [SerializeField]
     string mainSceneName = "OR_Room";
 
+    [SerializeField]
+    GameObject animatedHand;
+
+    GameObject wandCube;
+    GameObject wandRay;
+
     GameObject systemCenterNode;
 
     int selectableObjectsLayer;
     int buttonObjectsLayer;
 
     bool isClicked = false;
+    bool isClickedButton2 = false;
 
     bool isHoveringSelectableObject = false;
 
@@ -45,7 +58,8 @@ public class WandSelection : MonoBehaviour {
     ObjectDrag objectDrag;
 
     SoundManager soundManager;
-    ZonesNavigation zonesNavigation;
+
+    private SelectionState currentSelectionState = SelectionState.Ray;
 
 
     /// <summary>
@@ -73,7 +87,6 @@ public class WandSelection : MonoBehaviour {
         }
         avatarsHand = prefabPlayer.GetComponent<Hand>();
         objectDrag = prefabPlayer.GetComponentInChildren<ObjectDrag>();
-        zonesNavigation = prefabPlayer.GetComponent<ZonesNavigation>();
 
         // Do not show the hand's mesh
         // Find the hand's mesh
@@ -110,7 +123,13 @@ public class WandSelection : MonoBehaviour {
         soundManager = GameObject.FindObjectOfType<SoundManager>();
 
         // Initialize system center node
-        // systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
+        //systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
+        wandCube = GameObject.Find("WandCube");
+        wandRay = GameObject.Find("WandRay");
+
+        // Disable the animated hand by default
+        if (animatedHand != null)
+            animatedHand.SetActive(false);
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
@@ -122,8 +141,39 @@ public class WandSelection : MonoBehaviour {
         Vector3 laserForward = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
 
-
+        // Updated the animated hand's position
+        if (animatedHand != null) {
+            animatedHand.transform.position = transform.position;
+            animatedHand.transform.rotation = transform.rotation;
+        }
+            
         if (MiddleVR.VRDeviceMgr != null) {
+
+            bool isWandButtonPressed2 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(2);
+
+            // Switch between the laser and the hand
+            if (isWandButtonPressed2 && !isClickedButton2 && SceneManager.GetActiveScene().name == mainSceneName) {
+                isClickedButton2 = true;
+                switch (currentSelectionState) {
+                    case SelectionState.Hand :
+                        currentSelectionState = SelectionState.Ray;
+                        // Activate the wand cube and the wand ray
+                        wandCube.SetActive(true);
+                        wandRay.SetActive(true);
+                        animatedHand.SetActive(false);
+                        break;
+                    case SelectionState.Ray :
+                        currentSelectionState = SelectionState.Hand;
+                        // Deactivate the wand cube and the wand ray
+                        wandCube.SetActive(false);
+                        wandRay.SetActive(false);
+                        animatedHand.SetActive(true);
+                        break;
+                    default:
+                        currentSelectionState = SelectionState.Hand;
+                        break;
+                }
+            }
 
             // Set the ray color when manipulating an object
             if(isObjectSelected)
@@ -131,6 +181,7 @@ public class WandSelection : MonoBehaviour {
 
             // Getting state of primary wand button
             bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
+
             // The laser forward raycast
             if (Physics.Raycast(transform.position, laserForward , out hit)) {
 
@@ -190,6 +241,8 @@ public class WandSelection : MonoBehaviour {
             }
             if (!isWandButtonPressed0)
                 isClicked = false;
+            if (!isWandButtonPressed2)
+                isClickedButton2 = false;
         }
     }
     */
