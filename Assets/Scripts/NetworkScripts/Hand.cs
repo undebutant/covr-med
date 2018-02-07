@@ -41,7 +41,8 @@ public class Hand : NetworkBehaviour {
 
     SoundManager soundManager;
 
-    bool isInFrontOfPatient;
+    // Boolean to know if we are in front of the patient when we are the surgeon
+	bool isInFrontOfPatient;
     
 
     // The int value of the layer mask "Selectable"
@@ -140,7 +141,7 @@ public class Hand : NetworkBehaviour {
                             }
                         }
                     }
-                    // Using haptic arm
+                // Using haptic arm
                 } else {
                     // Move the GameObject according to the haptic arm
                     hand.transform.localPosition = hapticManager.HandPosition;
@@ -164,7 +165,7 @@ public class Hand : NetworkBehaviour {
                                 hapticManager.ReleaseSyringe();
                                 handMesh.SetActive(true);
                             }
-                            //If an object can be selected ...
+                        //If an object can be selected ...
                         } else {
                             if (objectToSelect != null) {
 
