@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 // TODO use ifdef maybe ?
-using MiddleVR_Unity3D;
+//using MiddleVR_Unity3D;
 
 
 public class WandSelection : MonoBehaviour {
@@ -114,7 +114,7 @@ public class WandSelection : MonoBehaviour {
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
-    
+    /*
     void Update () {
         // Update the prefab player hand's transform
         UpdatePrefabPlayerHand();
@@ -191,5 +191,5 @@ public class WandSelection : MonoBehaviour {
                 isClicked = false;
         }
     }
-     
+     */
 }
