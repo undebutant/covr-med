@@ -101,6 +101,7 @@ public class ObjectDrag : MonoBehaviour {
 
             if (distance < closeDistance) {
                 Vector3 newPos = zone.transform.position;
+                Quaternion newRot = zone.transform.rotation;
 
                 // Fix needed when the transform is not at the bottom of the object
                 // Fix done for the cube
@@ -108,9 +109,14 @@ public class ObjectDrag : MonoBehaviour {
                     newPos = newPos + new Vector3(0, objectSelected.transform.lossyScale.y / 2.0f, 0);
                 }
 
+                // Fix done for the Syringe
+                if (objectSelected.CompareTag("Syringe")) {
+                    newRot = newRot * Quaternion.Euler(0,90,90);
+                }
+
                 // Calling the synchronise online method to propagate the movement
                 // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
-                playerMoveObject.moveObject(objectSelected, newPos, zone.transform.rotation);
+                playerMoveObject.moveObject(objectSelected, newPos, newRot);
             }
 
             // Resetting the color since the object is no longer held

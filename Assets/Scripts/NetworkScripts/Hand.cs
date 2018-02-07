@@ -40,6 +40,9 @@ public class Hand : NetworkBehaviour {
     GameObject objectToSelect;
 
     SoundManager soundManager;
+
+    // Boolean to know if we are in front of the patient when we are the surgeon
+	bool isInFrontOfPatient;
     
 
     // The int value of the layer mask "Selectable"
@@ -93,9 +96,9 @@ public class Hand : NetworkBehaviour {
         config = GameObject.FindObjectOfType<ConfigInitializer>();
 
         soundManager = GameObject.FindObjectOfType<SoundManager>();
-        
 
 
+        isInFrontOfPatient = true;
     }
 
 
@@ -126,14 +129,14 @@ public class Hand : NetworkBehaviour {
                             Ray ray = avatarCamera.ScreenPointToRay(avatarCamera.WorldToScreenPoint(hand.transform.position));
 
                             RaycastHit shootHit;
-                       
+
                             // Whenever the rayCast hits something...
                             if (Physics.Raycast(ray, out shootHit, 1000)) {
                                 // ... matching the layer
                                 if (shootHit.collider.gameObject.layer == layerSelectable) {
                                     objectDrag.SelectObject(hand, shootHit.collider.gameObject, 0f);
 
-                                
+
                                 }
                             }
                         }
@@ -147,7 +150,7 @@ public class Hand : NetworkBehaviour {
                     hand.transform.localRotation = hapticManager.HandRotation;
 
 
-                    // Test if the button1 of the haptic controller is 
+                    // Test if the button1 of the haptic controller is clicked
                     if (hapticManager.GetButtonDown(1)) {
                         // If an object is currently beeing draged ...
                         if (objectDrag.GetIsDragFeatureOn()) {
@@ -171,12 +174,25 @@ public class Hand : NetworkBehaviour {
 
                                 // ... start dragging the object
                                 objectDrag.SelectObject(hand, objectToSelect, 0f);
-                              
+
                                 // When the object selected is a syringe, make the hand disappear and tell the haptic manager that a syringe is selected
                                 if (objectToSelect.CompareTag("Syringe")) {
                                     hapticManager.SelectSyringe();
                                     handMesh.SetActive(false);
                                 }
+                            }
+                        }
+                    }
+
+                    // Test if the button2 of the haptic controller is clicked
+                    if (hapticManager.GetButtonDown(2) && (config.GetPlayerRole() == PlayerRole.Surgeon)) {
+                        if (!handColliderScript.GetIsContactTable() && !handColliderScript.GetIsContactTissue()) { 
+                            if (isInFrontOfPatient) {
+                                transform.Rotate(0, 60, 0);
+                                isInFrontOfPatient = false;
+                            } else {
+                                transform.Rotate(0, -60, 0);
+                                isInFrontOfPatient = true;
                             }
                         }
                     }
