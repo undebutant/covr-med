@@ -1,0 +1,16 @@
+fileFormatVersion: 2
+guid: 15ec06f53e3c07e45963cd6019cc5074
+timeCreated: 1517486331
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - playerMoveObject: {instanceID: 0}
+  - selectionSound: {fileID: 82195904367042314, guid: c86ac3ecb576ddf49badbfdd7d19d8ef,
+      type: 2}
+  - releaseSound: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,6 +1,6 @@
 # covr-med
 
-GitHub repository with the Unity 5.1.0 code for the covr-med project with the IBISC laboratory.
+GitHub repository with the Unity 5.1.1 code for the covr-med project with the IBISC laboratory.
 
 
 ## To do list
@@ -37,22 +37,22 @@ Here are the dependencies, relevent links and the external resources used for th
 
 To add a new branch in the local repository
 ```bash
-git checkout -b name_of_the_branch
+git checkout -b name_of_the_branch_00x
 ```
 
 To push a branch to the distant repository
 ```bash
-git push -u origin name_of_the_branch
+git push -u origin name_of_the_branch_00x
 ```
 
 To delete a branch in the local repository
 ```bash
-git branch -d name_of_the_branch
+git branch -d name_of_the_branch_00x
 ```
 
 To delete a branch in the distant repository
 ```bash
-git push -d origin name_of_the_branch
+git push -d origin name_of_the_branch_00x
 ```
 
 
@@ -95,7 +95,7 @@ To keep safe a series of changes before a checkout
 git stash save
 ```
 
-To keep safe a series of changes before a checkout
+To get back the stashed modifications
 ```bash
 git stash pop number_of_the_stash_to_apply_and_drop
 ```

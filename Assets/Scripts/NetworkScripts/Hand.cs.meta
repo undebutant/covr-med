@@ -1,0 +1,24 @@
+fileFormatVersion: 2
+guid: 5cde76e617bd813448248ed5b9321c5d
+timeCreated: 1517487538
+licenseType: Free
+MonoImporter:
+  serializedVersion: 2
+  defaultReferences:
+  - syncPlayerTransform: {instanceID: 0}
+  - objectDrag: {instanceID: 0}
+  - inputManager: {instanceID: 0}
+  - prefabTransform: {instanceID: 0}
+  - hand: {instanceID: 0}
+  - handMesh: {instanceID: 0}
+  - handColliderScript: {instanceID: 0}
+  - avatarCamera: {instanceID: 0}
+  - selectionSound: {fileID: 82195904367042314, guid: c86ac3ecb576ddf49badbfdd7d19d8ef,
+      type: 2}
+  - releaseSound: {instanceID: 0}
+  - hapticManager: {instanceID: 0}
+  executionOrder: 0
+  icon: {instanceID: 0}
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

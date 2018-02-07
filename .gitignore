@@ -22,6 +22,7 @@ ExportedObj/
 *.booproj
 *.svd
 *.pdb
+*.json
 
 # Unity3D generated meta files
 *.pidb.meta
@@ -35,3 +36,11 @@ sysinfo.txt
 
 # New assets to test, that will be added later if used
 Assets/HeavyAssets*
+
+# OR_Room bought assets
+Assets/OR_Room*
+
+# CAVE
+Assets/MiddleVR*
+Assets/Editor*
+Assets/Plugin*
