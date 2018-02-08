@@ -152,10 +152,10 @@ public class WandSelection : MonoBehaviour {
 
             // Get the state of primary wand buttons
             bool isWandButtonPressed2 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(2);
-            bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
+            bool isWandButtonPressed3 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(3);
                 
             // Animate the animated hand
-            if (isWandButtonPressed0) {
+            if (isWandButtonPressed3) {
                 if (currentHandState == HandState.Opened) {
                     currentHandState = HandState.Closed;
                     avatarsHand.CloseHand();
@@ -219,7 +219,7 @@ public class WandSelection : MonoBehaviour {
                     // Set the color of the wand's ray
                     GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
                     // Click on the button only once
-                    if (isWandButtonPressed0 && !isClicked) {
+                    if (isWandButtonPressed3 && !isClicked) {
                         isClicked = true;
                         mainMenuManager.OnHitButton(hit.collider.gameObject);
                     }
@@ -232,13 +232,13 @@ public class WandSelection : MonoBehaviour {
                 // If a navigation zone was selected, a teleportation toward this zone is operated
                 if (hit.collider.gameObject.tag == "NavigationZone" && currentSelectionState == SelectionState.Ray) {
                     GameObject zone = hit.collider.gameObject;
-                    if (isWandButtonPressed0 && !isClicked) {
+                    if (isWandButtonPressed3 && !isClicked) {
                         isClicked = true;
                         systemCenterNode.transform.position = new Vector3(zone.transform.position.x, systemCenterNode.transform.position.y, zone.transform.position.z);                 
                     }
                 }
             }
-            if (!isWandButtonPressed0)
+            if (!isWandButtonPressed3)
                 isClicked = false;
             if (!isWandButtonPressed2)
                 isClickedButton2 = false;
