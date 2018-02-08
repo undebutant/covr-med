@@ -15,11 +15,30 @@ public class PlayerMoveObject : NetworkBehaviour {
 
     private NetworkIdentity objNetId;
 
+    [SerializeField]
+    [Tooltip("The time taken to lerp to the final destination")]
+    float lerpingTime;
+
+    [SerializeField]
+    [Tooltip("The time taken to slerp to the final orientation")]
+    float slerpingTime;
+
+
+    private void LerpPosition(GameObject objectToMove, Vector3 targetPosition) {
+        // Translate smoothly the object
+        objectToMove.transform.position = Vector3.Lerp(objectToMove.transform.position, targetPosition, Time.deltaTime * lerpingTime);
+    }
+
+    private void SlerpRotation(GameObject objectToMove, Quaternion targetRotation) {
+        // Rotate smoothly the object
+        objectToMove.transform.rotation = Quaternion.Slerp(objectToMove.transform.rotation, targetRotation, Time.deltaTime * slerpingTime);
+    }
+
 
     /// <summary>
     ///     The callable method that we need to call in order to synchronise an object movement
     /// </summary>
-    public void moveObject(GameObject objectToMove, Vector3 pos, Quaternion rot) {
+    public void MoveObject(GameObject objectToMove, Vector3 pos, Quaternion rot) {
         // Making sure that the call is made by a local player
         // TODO deactivate the ObjectDrag script on the non local avatar
         if (isLocalPlayer) {
@@ -36,8 +55,8 @@ public class PlayerMoveObject : NetworkBehaviour {
     /// </summary>
     [ClientRpc]
     void RpcMove(GameObject obj,Vector3 pos, Quaternion rot) {
-        obj.transform.position = pos;
-        obj.transform.rotation = rot;
+        LerpPosition(obj, pos);
+        SlerpRotation(obj, rot);
     }
 
 

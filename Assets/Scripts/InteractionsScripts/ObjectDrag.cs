@@ -91,7 +91,7 @@ public class ObjectDrag : MonoBehaviour {
 
             // Calling the synchronise online method to propagate the movement
             // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
-            playerMoveObject.moveObject(objectSelected, newPos, newRot);
+            playerMoveObject.MoveObject(objectSelected, newPos, newRot);
             
             // Checking whether or not the object is close enough to highlight the snap zone
             float distance = Vector3.Distance(zonePosition, objectSelected.transform.position);
@@ -127,7 +127,7 @@ public class ObjectDrag : MonoBehaviour {
 
                 // Calling the synchronise online method to propagate the movement
                 // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
-                playerMoveObject.moveObject(objectSelected, newPos, newRot);
+                playerMoveObject.MoveObject(objectSelected, newPos, newRot);
             }
 
             // Resetting the color since the object is no longer held
