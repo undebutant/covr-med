@@ -145,8 +145,6 @@ public class WandSelection : MonoBehaviour {
         // Update the prefab player hand's transform
         UpdatePrefabPlayerHand();
 
-        Debug.Log("Current selection state : " + currentSelectionState);
-
         Vector3 laserForward = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
             
