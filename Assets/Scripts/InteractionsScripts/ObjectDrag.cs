@@ -29,6 +29,9 @@ public class ObjectDrag : MonoBehaviour {
     Color closeColor = new Color(0, 1, 0);          // The color of the area whenever a dragged object is nearby
     private Color normalColor = new Color();
 
+    // The config initialized on startup
+    ConfigInitializer configInitializer;
+
 
     public bool GetIsDragFeatureOn () {
         return isDragFeatureOn;
@@ -41,6 +44,14 @@ public class ObjectDrag : MonoBehaviour {
         normalColor = zone.GetComponent<Renderer>().material.color;
 
         isDragFeatureOn = false;
+
+        // Fetching the config component
+        configInitializer = GameObject.FindObjectOfType<ConfigInitializer>();
+
+        // Allowing snaping from a larger distance when using the cave
+        if (configInitializer.GetDisplayDevice() == DisplayDevice.Cave) {
+            closeDistance = 1.5f;
+        }
     }
     
 
