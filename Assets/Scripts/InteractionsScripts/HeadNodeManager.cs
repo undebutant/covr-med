@@ -30,7 +30,7 @@ public class HeadNodeManager : MonoBehaviour {
         wandSelection = vrWand.GetComponent<WandSelection>();
 	}
 
-    /*
+#if MIDDLEVR_BUILD
 	void Update () {
         if (SceneManager.GetActiveScene().name == mainSceneName) {
             // Wait for the WandSelection to find the local prefab player
@@ -47,5 +47,5 @@ public class HeadNodeManager : MonoBehaviour {
             prefabPlayerCamera.transform.rotation = newRotation;
         } 
     }
-     * */
+#endif
 }
