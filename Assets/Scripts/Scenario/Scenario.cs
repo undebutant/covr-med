@@ -122,7 +122,6 @@ public class Scenario : MonoBehaviour {
                 }
             }
             else if (xnode.Name == "Scenario") {
-                int i = 0;
                 foreach (XmlNode stepXml in xnode.ChildNodes) {
                     Step step = new Step(Int32.Parse(stepXml.Attributes["number"].Value), stepXml.Attributes["name"].Value);
                     foreach (XmlNode subStepXml in stepXml.ChildNodes) {
@@ -172,13 +171,11 @@ public class Scenario : MonoBehaviour {
 			}
 		}
         else if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.ObjectSelected) {
-            GameObject user = currentStep.CurrentSubStep.UserId == 0 ? GameObject.Find("Camera") : GameObject.Find("Camera"); //    Awful, TODO : manage the logic behind the users
             if (GetSelectedObject() == selectableObjects[currentStep.CurrentSubStep.OtherObjectId].associatedObject) {
                 currentStep.MoveToNextSubStep();
             }
         }
 		else if (currentStep.CurrentSubStep.AccomplishmentCondition == Condition.ObjectReleased) {
-			GameObject user = currentStep.CurrentSubStep.UserId == 0 ? GameObject.Find("Camera") : GameObject.Find("Camera"); //    Awful, TODO : manage the logic behind the users
 			if (GetSelectedObject() == null) {
 				currentStep.MoveToNextSubStep();
 			}
