@@ -25,7 +25,7 @@ public class ObjectDrag : MonoBehaviour {
 
     // Snap variables
     GameObject zone;                                // The area to touch with the object for the snap feature
-    public float closeDistance = 1.0f;              // The maximum range between the snap zone and the object for the snap to work
+    public float closeDistance;              // The maximum range between the snap zone and the object for the snap to work
     Color closeColor = new Color(0, 1, 0);          // The color of the area whenever a dragged object is nearby
     private Color normalColor = new Color();
 
@@ -51,6 +51,9 @@ public class ObjectDrag : MonoBehaviour {
         // Allowing snaping from a larger distance when using the cave
         if (configInitializer.GetDisplayDevice() == DisplayDevice.Cave) {
             closeDistance = 1.5f;
+        }
+        else {
+            closeDistance = 1.0f;
         }
     }
     
