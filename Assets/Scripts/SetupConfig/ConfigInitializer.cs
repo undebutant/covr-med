@@ -1,8 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.VR;
 using UnityEngine.SceneManagement;
 using System;
 using System.IO;
-using UnityEngine.VR;
+using System.Collections;
 
 
 public class ConfigInitializer : MonoBehaviour {
@@ -106,15 +107,25 @@ public class ConfigInitializer : MonoBehaviour {
 
 
     /// <summary>
-    ///     Toggle on / off the VR setting on startup if we use a Monitor, according to the config loaded
+    ///     Toggle on the Oculus SDK and VR setting on startup if we use it, according to the config loaded
     /// </summary>
     void ToggleVR() {
-        if(startingConfig.displayDevice == DisplayDevice.Monitor) {
-            VRSettings.enabled = false;
+        if(startingConfig.displayDevice == DisplayDevice.Oculus) {
+            StartCoroutine(LoadDevice("Oculus"));
         }
-        else {
-            VRSettings.enabled = true;
-        }
+    }
+
+    /// <summary>
+    ///     Coroutine loading the VR device inserted as argument
+    ///     Please note that you need to add the target device in Unity editor (see Edit > Project Settings > Player > Virtual Reality SDKs)
+    ///     Disclaimer : it HAS to be a coroutine since it starts loading the SDK right after the call
+    /// </summary>
+    /// <param name="newDevice">The name of the VR device to load, as string</param>
+    /// <returns></returns>
+    IEnumerator LoadDevice(string newDevice) {
+        VRSettings.LoadDeviceByName(newDevice);
+        yield return null;
+        VRSettings.enabled = true;
     }
 
 
