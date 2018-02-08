@@ -2,6 +2,7 @@
 using UnityEngine.SceneManagement;
 using System;
 using System.IO;
+using UnityEngine.VR;
 
 
 public class ConfigInitializer : MonoBehaviour {
@@ -52,6 +53,10 @@ public class ConfigInitializer : MonoBehaviour {
         if(File.Exists(nameOfJSON)) {
             try {
                 startingConfig = JsonUtility.FromJson<StartingConfig>(File.ReadAllText(nameOfJSON));
+
+                // Checking if we need to disable the VR
+                DisableVR();
+
                 SceneManager.LoadScene(mainMenuScene);
             }
             // Catching error while parsing
@@ -68,6 +73,9 @@ public class ConfigInitializer : MonoBehaviour {
 
             // Creating a sample JSON file
             CreateBasicJSON(nameOfJSON, true);
+
+            // Checking if we need to disable the VR
+            DisableVR();
 
             SceneManager.LoadScene(mainMenuScene);
         }
@@ -94,6 +102,16 @@ public class ConfigInitializer : MonoBehaviour {
 
         // Saving the sample JSON
         File.WriteAllText(nameOfJSON, JsonUtility.ToJson(startingConfig));
+    }
+
+
+    /// <summary>
+    ///     Toggle off the VR setting on startup if we use a Monitor, according to the config loaded
+    /// </summary>
+    void DisableVR() {
+        if(startingConfig.displayDevice == DisplayDevice.Monitor) {
+            VRSettings.enabled = false;
+        }
     }
 
 
