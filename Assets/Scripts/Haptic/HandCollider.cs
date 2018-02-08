@@ -9,6 +9,10 @@ public class HandCollider : MonoBehaviour {
 
     SoundManager soundManager;
 
+    public bool isOnTriggerStay;
+
+    public GameObject collidedObject;
+
 
     // Stock the height of the last tissue encountered in collision
     float lastTissueY;
@@ -73,7 +77,9 @@ public class HandCollider : MonoBehaviour {
         lastTissueY = 0;
 
         soundManager = GameObject.FindObjectOfType<SoundManager>();
+        isOnTriggerStay = false;
 
+        collidedObject = null;
     }
 
 
@@ -82,6 +88,7 @@ public class HandCollider : MonoBehaviour {
         if (other.gameObject.layer == layerSelectable) {
             // ... tell the handScript that he can grab this object
             handScript.ObjectToSelect = other.gameObject;
+            collidedObject = other.gameObject;
 
             // Plays the hover sound 
             soundManager.PlayHoverSound(new Vector3(0,0,0));
@@ -108,6 +115,8 @@ public class HandCollider : MonoBehaviour {
         {
             // ... tell the handscript that he can no longer grab it
             handScript.ObjectToSelect = null;
+            collidedObject = null;
+            isOnTriggerStay = false;
         }
 
         // If the object in the patient layer is no longer colliding with the hand
@@ -118,6 +127,12 @@ public class HandCollider : MonoBehaviour {
         // If the object in the table layer is no longer colliding with the hand
         if (other.gameObject.layer == layerTable) {
             LeaveTable();
+        }
+    }
+
+    private void OnTriggerStay(Collider other) {
+        if (other.gameObject.layer == layerSelectable) {
+            isOnTriggerStay = true;
         }
     }
 }

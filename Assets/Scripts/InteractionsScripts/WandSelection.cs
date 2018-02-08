@@ -2,8 +2,20 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
-// TODO use ifdef maybe ?
-// using MiddleVR_Unity3D;
+
+#if MIDDLEVR_BUILD
+using MiddleVR_Unity3D;
+#endif
+
+enum HandState {
+    Opened,
+    Closed,
+}
+
+enum SelectionState {
+    Ray,
+    Hand,
+}
 
 
 public class WandSelection : MonoBehaviour {
@@ -20,12 +32,16 @@ public class WandSelection : MonoBehaviour {
     [SerializeField]
     string mainSceneName = "OR_Room";
 
+    GameObject wandCube;
+    GameObject wandRay;
+
     GameObject systemCenterNode;
 
     int selectableObjectsLayer;
     int buttonObjectsLayer;
 
     bool isClicked = false;
+    bool isClickedButton2 = false;
 
     bool isHoveringSelectableObject = false;
 
@@ -41,11 +57,16 @@ public class WandSelection : MonoBehaviour {
     // The hand script of the local player avatar prefab
     Hand avatarsHand;
 
+    HandCollider avatarsHandCollider;
+
+    private HandState currentHandState = HandState.Opened;
+
     // Object drag's script of the prefab player
     ObjectDrag objectDrag;
 
     SoundManager soundManager;
-    ZonesNavigation zonesNavigation;
+
+    private SelectionState currentSelectionState = SelectionState.Ray;
 
 
     /// <summary>
@@ -72,12 +93,11 @@ public class WandSelection : MonoBehaviour {
                 yield return new WaitForSeconds(1);
         }
         avatarsHand = prefabPlayer.GetComponent<Hand>();
+        avatarsHandCollider = avatarsHand.GetComponentInChildren<HandCollider>();
         objectDrag = prefabPlayer.GetComponentInChildren<ObjectDrag>();
-        zonesNavigation = prefabPlayer.GetComponent<ZonesNavigation>();
 
-        // Do not show the hand's mesh
-        // Find the hand's mesh
-        avatarsHand.GetHandMesh().SetActive(false);
+        // Wand by default
+        avatarsHand.SetHandMeshActive(false);
 
         yield return null;
     }
@@ -110,27 +130,68 @@ public class WandSelection : MonoBehaviour {
         soundManager = GameObject.FindObjectOfType<SoundManager>();
 
         // Initialize system center node
-        // systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
-    }
+#if MIDDLEVR_BUILD
+        systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
+#endif
+        wandCube = GameObject.Find("WandCube");
+        wandRay = GameObject.Find("WandRay");
 
-    // TODO see TODO above, need workaround for non MiddleVR devices
-    /*
+        // Initialize the hand
+        currentHandState = HandState.Opened;
+    }
+    
+#if MIDDLEVR_BUILD
     void Update () {
         // Update the prefab player hand's transform
         UpdatePrefabPlayerHand();
 
         Vector3 laserForward = transform.TransformDirection(Vector3.forward);
         RaycastHit hit;
-
-
+            
         if (MiddleVR.VRDeviceMgr != null) {
+
+            // Get the state of primary wand buttons
+            bool isWandButtonPressed2 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(2);
+            bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
+                
+            // Animate the animated hand
+            if (isWandButtonPressed0) {
+                if (currentHandState == HandState.Opened) {
+                    currentHandState = HandState.Closed;
+                    avatarsHand.CloseHand();
+                }
+            } else {
+                if (currentHandState == HandState.Closed) {
+                    currentHandState = HandState.Opened;
+                    avatarsHand.OpenHand();
+                }
+            }
+
+            // Switch between the laser and the hand
+            if (isWandButtonPressed2 && !isClickedButton2 && SceneManager.GetActiveScene().name == mainSceneName) {
+                isClickedButton2 = true;
+                switch (currentSelectionState) {
+                    case SelectionState.Hand :
+                        currentSelectionState = SelectionState.Ray;
+                        // Activate the wand cube and the wand ray
+                        wandCube.SetActive(true);
+                        wandRay.SetActive(true);
+                        avatarsHand.SetHandMeshActive(false);
+                        break;
+                    case SelectionState.Ray :
+                        currentSelectionState = SelectionState.Hand;
+                        // Deactivate the wand cube and the wand ray
+                        wandCube.SetActive(false);
+                        wandRay.SetActive(false);
+                        avatarsHand.SetHandMeshActive(true);
+                        break;
+                }
+            }
 
             // Set the ray color when manipulating an object
             if(isObjectSelected)
                 GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
 
-            // Getting state of primary wand button
-            bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
             // The laser forward raycast
             if (Physics.Raycast(transform.position, laserForward , out hit)) {
 
@@ -145,8 +206,7 @@ public class WandSelection : MonoBehaviour {
 
                     isHoveringSelectableObject = true;
 
-                    if (isWandButtonPressed0 && !isClicked) {
-                        isClicked = true;
+                    if (currentHandState == HandState.Closed && !isObjectSelected && currentSelectionState == SelectionState.Ray) {
                         isObjectSelected = true;
                         selectedObject = hit.collider.gameObject;
                         objectDrag.SelectObject(wand, selectedObject, Vector3.Distance(wand.transform.position, selectedObject.transform.position));
@@ -163,16 +223,6 @@ public class WandSelection : MonoBehaviour {
                         isClicked = true;
                         mainMenuManager.OnHitButton(hit.collider.gameObject);
                     }
-
-                    // Release object
-                } else if (isWandButtonPressed0 && !isClicked && isObjectSelected) {
-                        isClicked = true;
-                        isObjectSelected = false;
-                        selectedObject = null;
-                        objectDrag.ReleaseObject();
-
-                        // Playing the selection sound effect
-                        soundManager.PlayDropSound(hit.collider.gameObject.transform.position);
                 }
 
                 // Set isHoveringSelectableObject to false if not hovering
@@ -180,7 +230,7 @@ public class WandSelection : MonoBehaviour {
                     isHoveringSelectableObject = false;
 
                 // If a navigation zone was selected, a teleportation toward this zone is operated
-                if (hit.collider.gameObject.tag == "NavigationZone") {
+                if (hit.collider.gameObject.tag == "NavigationZone" && currentSelectionState == SelectionState.Ray) {
                     GameObject zone = hit.collider.gameObject;
                     if (isWandButtonPressed0 && !isClicked) {
                         isClicked = true;
@@ -190,7 +240,26 @@ public class WandSelection : MonoBehaviour {
             }
             if (!isWandButtonPressed0)
                 isClicked = false;
+            if (!isWandButtonPressed2)
+                isClickedButton2 = false;
+            if (avatarsHandCollider.isOnTriggerStay && isObjectSelected == false && currentHandState == HandState.Closed && currentSelectionState == SelectionState.Hand) {
+                isObjectSelected = true;
+                selectedObject = avatarsHandCollider.collidedObject;
+                objectDrag.SelectObject(wand, selectedObject, 0.0f);
+                // Playing the selection sound effect
+                soundManager.PlaySelectionSound(selectedObject.transform.position);
+            }
+        }
+
+        // Release Object (if one is selected) whenever the hand is opened
+        if (currentHandState == HandState.Opened && isObjectSelected) {
+            isObjectSelected = false;
+            objectDrag.ReleaseObject();
+
+            // Playing the selection sound effect
+            soundManager.PlayDropSound(selectedObject.transform.position);
+            selectedObject = null;
         }
     }
-    */
+#endif
 }
