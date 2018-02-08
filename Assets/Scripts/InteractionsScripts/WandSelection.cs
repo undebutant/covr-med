@@ -4,11 +4,16 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using CHSF;
 // TODO use ifdef maybe ?
-//using MiddleVR_Unity3D;
+// using MiddleVR_Unity3D;
 
 enum SelectionState {
     Ray,
     Hand,
+}
+
+enum AnimatedHandState {
+    Opened,
+    Closed,
 }
 
 
@@ -28,6 +33,7 @@ public class WandSelection : MonoBehaviour {
 
     [SerializeField]
     GameObject animatedHand;
+    HandLerp animatedHandHandLerp;
 
     GameObject wandCube;
     GameObject wandRay;
@@ -60,6 +66,7 @@ public class WandSelection : MonoBehaviour {
     SoundManager soundManager;
 
     private SelectionState currentSelectionState = SelectionState.Ray;
+    private AnimatedHandState currentAnimationHandState = AnimatedHandState.Opened;
 
 
     /// <summary>
@@ -123,13 +130,15 @@ public class WandSelection : MonoBehaviour {
         soundManager = GameObject.FindObjectOfType<SoundManager>();
 
         // Initialize system center node
-        //systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
+        systemCenterNode = GameObject.Find("VRManager").GetComponent<VRManagerScript>().VRSystemCenterNode;
         wandCube = GameObject.Find("WandCube");
         wandRay = GameObject.Find("WandRay");
 
         // Disable the animated hand by default
-        if (animatedHand != null)
+        if (animatedHand != null) {
             animatedHand.SetActive(false);
+            animatedHandHandLerp = animatedHand.GetComponent<HandLerp>();
+        }   
     }
 
     // TODO see TODO above, need workaround for non MiddleVR devices
@@ -149,7 +158,22 @@ public class WandSelection : MonoBehaviour {
             
         if (MiddleVR.VRDeviceMgr != null) {
 
+            // Get the state of primary wand buttons
             bool isWandButtonPressed2 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(2);
+            bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
+                
+            // Animate the animated hand
+            if (isWandButtonPressed0) {
+                if (currentAnimationHandState == AnimatedHandState.Opened) {
+                    currentAnimationHandState = AnimatedHandState.Closed;
+                    animatedHandHandLerp.Play();
+                }
+            } else {
+                if (currentAnimationHandState == AnimatedHandState.Closed) {
+                    currentAnimationHandState = AnimatedHandState.Opened;
+                    animatedHandHandLerp.Revert();
+                }
+            }
 
             // Switch between the laser and the hand
             if (isWandButtonPressed2 && !isClickedButton2 && SceneManager.GetActiveScene().name == mainSceneName) {
@@ -178,9 +202,6 @@ public class WandSelection : MonoBehaviour {
             // Set the ray color when manipulating an object
             if(isObjectSelected)
                 GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
-
-            // Getting state of primary wand button
-            bool isWandButtonPressed0 = MiddleVR.VRDeviceMgr.IsWandButtonPressed(0);
 
             // The laser forward raycast
             if (Physics.Raycast(transform.position, laserForward , out hit)) {
