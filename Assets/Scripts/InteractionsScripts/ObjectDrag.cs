@@ -50,10 +50,10 @@ public class ObjectDrag : MonoBehaviour {
 
         // Allowing snaping from a larger distance when using the cave
         if (configInitializer.GetDisplayDevice() == DisplayDevice.Cave) {
-            closeDistance = 1.5f;
+            closeDistance = 0.15f;
         }
         else {
-            closeDistance = 1.0f;
+            closeDistance = 0.1f;
         }
     }
     
