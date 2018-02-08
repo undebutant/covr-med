@@ -55,7 +55,7 @@ public class ConfigInitializer : MonoBehaviour {
                 startingConfig = JsonUtility.FromJson<StartingConfig>(File.ReadAllText(nameOfJSON));
 
                 // Checking if we need to disable the VR
-                DisableVR();
+                ToggleVR();
 
                 SceneManager.LoadScene(mainMenuScene);
             }
@@ -75,7 +75,7 @@ public class ConfigInitializer : MonoBehaviour {
             CreateBasicJSON(nameOfJSON, true);
 
             // Checking if we need to disable the VR
-            DisableVR();
+            ToggleVR();
 
             SceneManager.LoadScene(mainMenuScene);
         }
@@ -106,13 +106,34 @@ public class ConfigInitializer : MonoBehaviour {
 
 
     /// <summary>
-    ///     Toggle off the VR setting on startup if we use a Monitor, according to the config loaded
+    ///     Toggle on / off the VR setting on startup if we use a Monitor, according to the config loaded
     /// </summary>
-    void DisableVR() {
+    void ToggleVR() {
         if(startingConfig.displayDevice == DisplayDevice.Monitor) {
             VRSettings.enabled = false;
         }
+        else {
+            VRSettings.enabled = true;
+        }
     }
+
+
+    //////////////////////////////////////////////////////////////////////////
+    //             Getter for enum length to cycle through them             //
+    //////////////////////////////////////////////////////////////////////////
+
+    public int GetPlayerRoleEnumLength() {
+        return System.Enum.GetValues(typeof(PlayerRole)).Length;
+    }
+
+    public int GetDisplayDeviceEnumLength() {
+        return System.Enum.GetValues(typeof(DisplayDevice)).Length;
+    }
+
+    public int GetInputDeviceEnumLength() {
+        return System.Enum.GetValues(typeof(InputDevice)).Length;
+    }
+
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -147,8 +168,24 @@ public class ConfigInitializer : MonoBehaviour {
         isConnected = value;
     }
 
-    public void SetInputDevice (InputDevice newInputDevice) {
+    public void SetPlayerRole (PlayerRole newPlayerRole) {
+        startingConfig.playerRole = newPlayerRole;
+
+        // Updating JSON accordingly
+        CreateBasicJSON(nameOfJSON, false);
+    }
+
+    public void SetDisplayDevice(DisplayDevice newDisplayDevice) {
+        startingConfig.displayDevice = newDisplayDevice;
+
+        // Updating JSON accordingly
+        CreateBasicJSON(nameOfJSON, false);
+    }
+
+    public void SetInputDevice(InputDevice newInputDevice) {
         startingConfig.inputDevice = newInputDevice;
+
+        // Updating JSON accordingly
         CreateBasicJSON(nameOfJSON, false);
     }
 }
