@@ -32,7 +32,6 @@ public class Scenario : MonoBehaviour {
     ConfigInitializer config;
 
     bool IsClose() {
-        Debug.Log(steps[currentStepIndex].zone.name);
         return Vector3.Distance(steps[currentStepIndex].selectableObject.transform.position, steps[currentStepIndex].zone.transform.position) < 0.1;
     }
 
