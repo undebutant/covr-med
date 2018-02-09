@@ -24,7 +24,7 @@ public class ObjectDrag : MonoBehaviour {
     float distance;
 
     // Snap variables
-    GameObject zone;                                // The area to touch with the object for the snap feature
+    GameObject[] zones;                             // The areas to touch with the object for the snap feature
     public float closeDistance = 1.0f;              // The maximum range between the snap zone and the object for the snap to work
     Color closeColor = new Color(0, 1, 0);          // The color of the area whenever a dragged object is nearby
     private Color normalColor = new Color();
@@ -36,9 +36,9 @@ public class ObjectDrag : MonoBehaviour {
 
 
     void Start () {
-        // Finding the snap area and storing it
-        zone = GameObject.FindGameObjectWithTag("Zone");
-        normalColor = zone.GetComponent<Renderer>().material.color;
+        // Finding all the snap areas in the scene and storing them
+        zones = GameObject.FindGameObjectsWithTag("Zone");
+        normalColor = zones[0].GetComponent<Renderer>().material.color;
 
         isDragFeatureOn = false;
     }
@@ -79,15 +79,17 @@ public class ObjectDrag : MonoBehaviour {
                 newRot = newRot * Quaternion.Euler(0, 0, -90);
             }
 
-            Vector3 zonePosition = zone.transform.position;
-
             // Calling the synchronise online method to propagate the movement
             // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
             playerMoveObject.moveObject(objectSelected, newPos, newRot);
-            
-            // Checking whether or not the object is close enough to highlight the snap zone
-            float distance = Vector3.Distance(zonePosition, objectSelected.transform.position);
-            zone.GetComponent<Renderer>().material.color = (distance < closeDistance) ? closeColor : normalColor;
+
+            foreach (GameObject zone in zones) {
+                Vector3 zonePosition = zone.transform.position;
+
+                // Checking whether or not the object is close enough to highlight the snap zone considered
+                float distance = Vector3.Distance(zonePosition, objectSelected.transform.position);
+                zone.GetComponent<Renderer>().material.color = (distance < closeDistance) ? closeColor : normalColor;
+            }
         }
     }
 
@@ -97,33 +99,35 @@ public class ObjectDrag : MonoBehaviour {
     /// </summary>
     public void ReleaseObject() {
         if (isDragFeatureOn) {
-            Vector3 zonePosition = zone.transform.position;
+            foreach (GameObject zone in zones) {
+                Vector3 zonePosition = zone.transform.position;
 
-            // Checking whether or not the object is close enough to snap the object
-            float distance = Vector3.Distance(zonePosition, objectSelected.transform.position);
+                // Checking whether or not the object is close enough to snap the object to the zone considered
+                float distance = Vector3.Distance(zonePosition, objectSelected.transform.position);
 
-            if (distance < closeDistance) {
-                Vector3 newPos = zone.transform.position;
-                Quaternion newRot = zone.transform.rotation;
+                if (distance < closeDistance) {
+                    Vector3 newPos = zone.transform.position;
+                    Quaternion newRot = zone.transform.rotation;
 
-                // Fix needed when the transform is not at the bottom of the object
-                // Fix done for the cube
-                if (objectSelected.CompareTag("Cube")) {
-                    newPos = newPos + new Vector3(0, objectSelected.transform.lossyScale.y / 2.0f, 0);
+                    // Fix needed when the transform is not at the bottom of the object
+                    // Fix done for the cube
+                    if (objectSelected.CompareTag("Cube")) {
+                        newPos = newPos + new Vector3(0, objectSelected.transform.lossyScale.y / 2.0f, 0);
+                    }
+
+                    // Fix done for the Syringe
+                    if (objectSelected.CompareTag("Syringe")) {
+                        newRot = newRot * Quaternion.Euler(0, 90, 90);
+                    }
+
+                    // Calling the synchronise online method to propagate the movement
+                    // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
+                    playerMoveObject.moveObject(objectSelected, newPos, newRot);
                 }
 
-                // Fix done for the Syringe
-                if (objectSelected.CompareTag("Syringe")) {
-                    newRot = newRot * Quaternion.Euler(0,90,90);
-                }
-
-                // Calling the synchronise online method to propagate the movement
-                // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
-                playerMoveObject.moveObject(objectSelected, newPos, newRot);
-            }
-
-            // Resetting the color since the object is no longer held
-            zone.GetComponent<Renderer>().material.color = normalColor;
+                // Resetting the color since the object is no longer held
+                zone.GetComponent<Renderer>().material.color = normalColor;
+            } 
         }
         // Activate the physics
         objectSelected.GetComponent<Rigidbody>().isKinematic = false;
