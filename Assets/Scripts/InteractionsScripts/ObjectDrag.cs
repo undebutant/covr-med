@@ -57,6 +57,9 @@ public class ObjectDrag : MonoBehaviour {
             distance = newdistance;
 
             isDragFeatureOn = true;
+
+            // Deactivate the physics
+            newobjectSelected.GetComponent<Rigidbody>().isKinematic = true;
         } else {
             isDragFeatureOn = false;
 
@@ -122,6 +125,9 @@ public class ObjectDrag : MonoBehaviour {
             // Resetting the color since the object is no longer held
             zone.GetComponent<Renderer>().material.color = normalColor;
         }
+        // Activate the physics
+        objectSelected.GetComponent<Rigidbody>().isKinematic = false;
+
         deviceSelector = null;
         objectSelected = null;
 
