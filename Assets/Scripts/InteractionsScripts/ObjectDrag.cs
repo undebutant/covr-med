@@ -75,6 +75,9 @@ public class ObjectDrag : MonoBehaviour {
 
             // Deactivate the physics
             newobjectSelected.GetComponent<Rigidbody>().isKinematic = true;
+
+            // Syncing modification online
+            playerMoveObject.SyncObjectKinematic(newobjectSelected, true);
         } else {
             isDragFeatureOn = false;
 
@@ -84,7 +87,7 @@ public class ObjectDrag : MonoBehaviour {
 
 
     // The function called each frame to move the object
-    void MoveObject() {
+    void TrackSelectedObject() {
         if (isDragFeatureOn) {
             Vector3 newPos = deviceSelector.transform.position + deviceSelector.transform.forward * this.distance;
             Quaternion newRot = deviceSelector.transform.rotation;
@@ -146,6 +149,9 @@ public class ObjectDrag : MonoBehaviour {
         // Activate the physics
         objectSelected.GetComponent<Rigidbody>().isKinematic = false;
 
+        // Syncing modification online
+        playerMoveObject.SyncObjectKinematic(objectSelected, false);
+
         deviceSelector = null;
         objectSelected = null;
 
@@ -155,6 +161,6 @@ public class ObjectDrag : MonoBehaviour {
 
 
 	void Update () {
-        MoveObject();
+        TrackSelectedObject();
     } 
 }
