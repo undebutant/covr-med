@@ -73,9 +73,6 @@ public class ObjectDrag : MonoBehaviour {
 
             isDragFeatureOn = true;
 
-            // Deactivate the physics
-            newobjectSelected.GetComponent<Rigidbody>().isKinematic = true;
-
             // Syncing modification online
             playerMoveObject.SyncObjectKinematic(newobjectSelected, true);
         } else {
@@ -146,8 +143,6 @@ public class ObjectDrag : MonoBehaviour {
                 zone.GetComponent<Renderer>().material.color = normalColor;
             } 
         }
-        // Activate the physics
-        objectSelected.GetComponent<Rigidbody>().isKinematic = false;
 
         // Syncing modification online
         playerMoveObject.SyncObjectKinematic(objectSelected, false);
