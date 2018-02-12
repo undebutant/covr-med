@@ -1,7 +1,9 @@
 ﻿using UnityEngine;
+using UnityEngine.VR;
 using UnityEngine.SceneManagement;
 using System;
 using System.IO;
+using System.Collections;
 
 
 public class ConfigInitializer : MonoBehaviour {
@@ -52,6 +54,10 @@ public class ConfigInitializer : MonoBehaviour {
         if(File.Exists(nameOfJSON)) {
             try {
                 startingConfig = JsonUtility.FromJson<StartingConfig>(File.ReadAllText(nameOfJSON));
+
+                // Checking if we need to disable the VR
+                ToggleVR();
+
                 SceneManager.LoadScene(mainMenuScene);
             }
             // Catching error while parsing
@@ -68,6 +74,9 @@ public class ConfigInitializer : MonoBehaviour {
 
             // Creating a sample JSON file
             CreateBasicJSON(nameOfJSON, true);
+
+            // Checking if we need to disable the VR
+            ToggleVR();
 
             SceneManager.LoadScene(mainMenuScene);
         }
@@ -95,6 +104,47 @@ public class ConfigInitializer : MonoBehaviour {
         // Saving the sample JSON
         File.WriteAllText(nameOfJSON, JsonUtility.ToJson(startingConfig));
     }
+
+
+    /// <summary>
+    ///     Toggle on the Oculus SDK and VR setting on startup if we use it, according to the config loaded
+    /// </summary>
+    void ToggleVR() {
+        if(startingConfig.displayDevice == DisplayDevice.Oculus) {
+            StartCoroutine(LoadDevice("Oculus"));
+        }
+    }
+
+    /// <summary>
+    ///     Coroutine loading the VR device inserted as argument
+    ///     Please note that you need to add the target device in Unity editor (see Edit > Project Settings > Player > Virtual Reality SDKs)
+    ///     Disclaimer : it HAS to be a coroutine since it starts loading the SDK right after the call
+    /// </summary>
+    /// <param name="newDevice">The name of the VR device to load, as string</param>
+    /// <returns></returns>
+    IEnumerator LoadDevice(string newDevice) {
+        VRSettings.LoadDeviceByName(newDevice);
+        yield return null;
+        VRSettings.enabled = true;
+    }
+
+
+    //////////////////////////////////////////////////////////////////////////
+    //             Getter for enum length to cycle through them             //
+    //////////////////////////////////////////////////////////////////////////
+
+    public int GetPlayerRoleEnumLength() {
+        return System.Enum.GetValues(typeof(PlayerRole)).Length;
+    }
+
+    public int GetDisplayDeviceEnumLength() {
+        return System.Enum.GetValues(typeof(DisplayDevice)).Length;
+    }
+
+    public int GetInputDeviceEnumLength() {
+        return System.Enum.GetValues(typeof(InputDevice)).Length;
+    }
+
 
 
     //////////////////////////////////////////////////////////////////////////
@@ -129,8 +179,24 @@ public class ConfigInitializer : MonoBehaviour {
         isConnected = value;
     }
 
-    public void SetInputDevice (InputDevice newInputDevice) {
+    public void SetPlayerRole (PlayerRole newPlayerRole) {
+        startingConfig.playerRole = newPlayerRole;
+
+        // Updating JSON accordingly
+        CreateBasicJSON(nameOfJSON, false);
+    }
+
+    public void SetDisplayDevice(DisplayDevice newDisplayDevice) {
+        startingConfig.displayDevice = newDisplayDevice;
+
+        // Updating JSON accordingly
+        CreateBasicJSON(nameOfJSON, false);
+    }
+
+    public void SetInputDevice(InputDevice newInputDevice) {
         startingConfig.inputDevice = newInputDevice;
+
+        // Updating JSON accordingly
         CreateBasicJSON(nameOfJSON, false);
     }
 }

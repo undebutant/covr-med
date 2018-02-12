@@ -33,9 +33,4 @@ public class CanvasController : MonoBehaviour {
 
         //gameObject.GetComponentInChildren<Text>().text = root.ChildNodes[0].InnerText;
     }
-	
-	// Update is called once per frame
-	void Update () {
-	
-	}
 }

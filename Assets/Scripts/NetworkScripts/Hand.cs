@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Networking;
 using ManagedPhantom;
+using CHSF;
 
 
 public class Hand : NetworkBehaviour {
@@ -27,9 +28,8 @@ public class Hand : NetworkBehaviour {
     [Tooltip("The hand GameObject of this avatar")]
     GameObject hand;
 
-    [SerializeField]
-    [Tooltip("The hand GameObject of this avatar")]
-    GameObject handMesh;
+    // Script associated to the animated hand's mesh, that closes or opens this hand
+    HandLerp handLerp;
 
     [SerializeField]
     HandCollider handColliderScript;
@@ -62,6 +62,8 @@ public class Hand : NetworkBehaviour {
     // The config for the local instance
     ConfigInitializer config;
 
+    SkinnedMeshRenderer handMesh;
+
     public GameObject ObjectToSelect {
         set {
             objectToSelect = value;
@@ -78,10 +80,24 @@ public class Hand : NetworkBehaviour {
     }
 
     /// <summary>
-    ///     Returns the hand mesh associated to the prefab
+    ///     Close the hand mesh
     /// </summary>
-    public GameObject GetHandMesh() {
-        return handMesh;
+    public void CloseHand() {
+        handLerp.Play();
+    }
+
+    /// <summary>
+    ///     Open the hand mesh
+    /// </summary>
+    public void OpenHand() {
+        handLerp.Revert();
+    }
+
+    /// <summary>
+    ///     Set the hand mesh's state (active or inactive). Must be called if a laser is used for instance.
+    /// </summary>
+    public void SetHandMeshActive(bool isActive) {
+        handMesh.enabled = isActive;
     }
 
 
@@ -91,14 +107,13 @@ public class Hand : NetworkBehaviour {
 
         objectToSelect = null;
 
-        layerSelectable = LayerMask.NameToLayer("Selectable");
-
         config = GameObject.FindObjectOfType<ConfigInitializer>();
-
         soundManager = GameObject.FindObjectOfType<SoundManager>();
 
-
         isInFrontOfPatient = true;
+
+        handMesh = hand.GetComponentInChildren<SkinnedMeshRenderer>();
+        handLerp = hand.GetComponent<HandLerp>();
     }
 
 
@@ -154,7 +169,7 @@ public class Hand : NetworkBehaviour {
 
                                 // Reactivate the hand and tell the haptic manager that a syringe is not selected
                                 hapticManager.ReleaseSyringe();
-                                handMesh.SetActive(true);
+                                SetHandMeshActive(true);
                             }
                         //If an object can be selected ...
                         } else {
@@ -169,7 +184,7 @@ public class Hand : NetworkBehaviour {
                                 // When the object selected is a syringe, make the hand disappear and tell the haptic manager that a syringe is selected
                                 if (objectToSelect.CompareTag("Syringe")) {
                                     hapticManager.SelectSyringe();
-                                    handMesh.SetActive(false);
+                                    SetHandMeshActive(false);
                                 }
                             }
                         }

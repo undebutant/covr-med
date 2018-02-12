@@ -23,6 +23,15 @@ public class MainMenuManager : MonoBehaviour {
     [SerializeField]
     ConnectionManager connectionManager;
 
+    // The configuration class to get data from
+    ConfigInitializer configInitializer;
+
+    // Storing the length of each used enum in config, to cycle through them using the buttons
+    int playerRoleEnumLength;
+    int displayDeviceEnumLength;
+    int inputDeviceEnumLength;
+
+
     // ========== Set the texts displayed on the main menu ============
 
     /// <summary>
@@ -67,13 +76,17 @@ public class MainMenuManager : MonoBehaviour {
 
     void Start() {
         // Read data thanks to the configuration loader
-        GameObject configLoader = GameObject.Find("ConfigLoader");
-        ConfigInitializer configInitializer = configLoader.GetComponent<ConfigInitializer>();
+        configInitializer = GameObject.FindObjectOfType<ConfigInitializer>();
+
         SetRoleButtonDisplay(configInitializer.GetPlayerRole().ToString());
         SetDisplayDeviceButtonDisplay(configInitializer.GetDisplayDevice().ToString());
         SetInputDeviceButtonDisplay(configInitializer.GetInputDevice().ToString());
         SetHostIPDisplay(configInitializer.GetServerIP());
         SetHostPortDisplay(configInitializer.GetConnectionPort().ToString());
+
+        playerRoleEnumLength = configInitializer.GetPlayerRoleEnumLength();
+        displayDeviceEnumLength = configInitializer.GetDisplayDeviceEnumLength();
+        inputDeviceEnumLength = configInitializer.GetInputDeviceEnumLength();
     }
 
 
@@ -84,6 +97,24 @@ public class MainMenuManager : MonoBehaviour {
                 break;
             case "ClientHost":
                 connectionManager.StartAsClient();
+                break;
+            case "RoleButton":
+                // Cycling through the PlayerRole enum
+                configInitializer.SetPlayerRole((PlayerRole)((((int)configInitializer.GetPlayerRole()) + 1) % playerRoleEnumLength));
+                // Updating the button text
+                SetRoleButtonDisplay(configInitializer.GetPlayerRole().ToString());
+                break;
+            case "DisplayDeviceButton":
+                // Cycling through the DisplayDevice enum
+                configInitializer.SetDisplayDevice((DisplayDevice)((((int)configInitializer.GetDisplayDevice()) + 1) % displayDeviceEnumLength));
+                // Updating the button text
+                SetDisplayDeviceButtonDisplay(configInitializer.GetDisplayDevice().ToString());
+                break;
+            case "InputDeviceButton":
+                // Cycling through the InputDevice enum
+                configInitializer.SetInputDevice((InputDevice)((((int)configInitializer.GetInputDevice()) + 1) % inputDeviceEnumLength));
+                // Updating the button text
+                SetInputDeviceButtonDisplay(configInitializer.GetInputDevice().ToString());
                 break;
             default:
                 Debug.LogError("Reaching unexpected button name in the MainMenuManager");
