@@ -42,10 +42,6 @@ public class NetworkAvatarSetup : NetworkBehaviour {
     Hand playerHandScript;
 
     [SerializeField]
-    [Tooltip("The collider of the player avatar prefab, to set active on creation of the avatar")]
-    Collider playerCollider;
-
-    [SerializeField]
     [Tooltip("The input manager of the player avatar prefab, to set active on creation of the avatar")]
     InputManager playerInputManager;
 
@@ -85,9 +81,6 @@ public class NetworkAvatarSetup : NetworkBehaviour {
         if (isLocalPlayer) {
             // Enabling the avatar's camera GameObject
             playerCamera.SetActive(true);
-
-            // Enabling the player's collider
-            playerCollider.enabled = true;
 
             // Enabling the player's input manager
             playerInputManager.enabled = true;

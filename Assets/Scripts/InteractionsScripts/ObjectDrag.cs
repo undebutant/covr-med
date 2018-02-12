@@ -96,7 +96,7 @@ public class ObjectDrag : MonoBehaviour {
 
             // Calling the synchronise online method to propagate the movement
             // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
-            playerMoveObject.MoveObject(objectSelected, newPos, newRot);
+            playerMoveObject.MoveObject(objectSelected, newPos, newRot, false);
 
             foreach (GameObject zone in zones) {
                 Vector3 zonePosition = zone.transform.position;
@@ -137,7 +137,7 @@ public class ObjectDrag : MonoBehaviour {
 
                     // Calling the synchronise online method to propagate the movement
                     // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
-                    playerMoveObject.MoveObject(objectSelected, newPos, newRot);
+                    playerMoveObject.MoveObject(objectSelected, newPos, newRot, true);
                 }
                 // Resetting the color since the object is no longer held
                 zone.GetComponent<Renderer>().material.color = normalColor;
