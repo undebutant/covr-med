@@ -10,10 +10,6 @@ using ManagedPhantom;
 public class HapticManager : MonoBehaviour {
 
     // Variables declarations
-
-    /// Tag for logging information (Debug purpose only)
-    private static string _tag = ".::. HapticManager .::. ";
-
     private SimplePhantomUnity phantom = null;
 
     [SerializeField]

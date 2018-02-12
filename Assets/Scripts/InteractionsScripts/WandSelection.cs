@@ -73,8 +73,6 @@ public class WandSelection : MonoBehaviour {
     ///     Finds the local prefab player
     /// </summary>
     IEnumerator FindPrefabPlayer() {
-        List<GameObject> playerPrefabs = new List<GameObject>();
-
         while (prefabPlayer == null) {
             GameObject[] gameObjects = GameObject.FindObjectsOfType<GameObject>();
 

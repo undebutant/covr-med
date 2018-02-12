@@ -107,10 +107,7 @@ public class Hand : NetworkBehaviour {
 
         objectToSelect = null;
 
-        layerSelectable = LayerMask.NameToLayer("Selectable");
-
         config = GameObject.FindObjectOfType<ConfigInitializer>();
-
         soundManager = GameObject.FindObjectOfType<SoundManager>();
 
         isInFrontOfPatient = true;

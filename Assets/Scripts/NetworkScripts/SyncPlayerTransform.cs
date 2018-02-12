@@ -25,13 +25,16 @@ public class SyncPlayerTransform : NetworkBehaviour {
     [Tooltip("The transform of this specific hand of the prefab")]
     Transform selfTransformHand;
 
-    [SerializeField]
-    [Tooltip("The time taken to lerp to the final destination")]
-    float lerpingTime;
+    private float journeyLengthLerpAvatar;
+    private float journeyLengthLerpHand;
 
     [SerializeField]
-    [Tooltip("The time taken to slerp to the final orientation")]
-    float slerpingTime;
+    [Tooltip("The speed to lerp to the final destination")]
+    float lerpingSpeed;
+
+    [SerializeField]
+    [Tooltip("The speed to slerp to the final destination")]
+    float slerpingSpeed;
 
 
     // Disclaimer : SyncVar means that everytime a change is made server side, it is automatically send to all clients
@@ -53,6 +56,8 @@ public class SyncPlayerTransform : NetworkBehaviour {
     private void FixedUpdate() {
         // Synchronise the position and rotation of the avatar and the hand only if this avatar is not controlled locally
         if (!isLocalPlayer) {
+            journeyLengthLerpAvatar = Vector3.Distance(selfTransformAvatar.position, targetPosition);
+            journeyLengthLerpHand = Vector3.Distance(selfTransformHand.position, handPosition);
             LerpPosition();
             SlerpRotation();
         }
@@ -65,16 +70,20 @@ public class SyncPlayerTransform : NetworkBehaviour {
 
     private void LerpPosition() {
         // Translate the parent
-        selfTransform.position = Vector3.Lerp(selfTransform.position, targetPosition, Time.deltaTime * lerpingTime);
+        float distanceCovered = Time.deltaTime * lerpingSpeed;
+        float fractJourney = distanceCovered / journeyLengthLerpAvatar;
+        selfTransform.position = Vector3.Lerp(selfTransform.position, targetPosition, fractJourney);
         // Translate the hand
-        selfTransformHand.position = Vector3.Lerp(selfTransformHand.position, handPosition, Time.deltaTime * lerpingTime);
+        fractJourney = distanceCovered / journeyLengthLerpHand;
+        selfTransformHand.position = Vector3.Lerp(selfTransformHand.position, handPosition, fractJourney);
     }
 
     private void SlerpRotation() {
+        float fractJourney = Time.deltaTime * slerpingSpeed;
         // Rotate the avatar
-        selfTransformAvatar.rotation = Quaternion.Slerp(selfTransformAvatar.rotation, targetRotation, Time.deltaTime * slerpingTime);
+        selfTransformAvatar.rotation = Quaternion.Slerp(selfTransformAvatar.rotation, targetRotation, fractJourney);
         // Rotate the hand
-        selfTransformHand.rotation = Quaternion.Slerp(selfTransformHand.rotation, handRotation, Time.deltaTime * slerpingTime);
+        selfTransformHand.rotation = Quaternion.Slerp(selfTransformHand.rotation, handRotation, fractJourney);
     }
 
 
