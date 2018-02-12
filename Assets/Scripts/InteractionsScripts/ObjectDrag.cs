@@ -25,9 +25,13 @@ public class ObjectDrag : MonoBehaviour {
 
     // Snap variables
     GameObject[] zones;                             // The areas to touch with the object for the snap feature
-    public float closeDistance = 1.0f;              // The maximum range between the snap zone and the object for the snap to work
+    public float closeDistance;                     // The maximum range between the snap zone and the object for the snap to work
+
     Color closeColor = new Color(0, 1, 0);          // The color of the area whenever a dragged object is nearby
     private Color normalColor = new Color();
+
+    // The config initialized on startup
+    ConfigInitializer configInitializer;
 
 
     public bool GetIsDragFeatureOn () {
@@ -41,6 +45,17 @@ public class ObjectDrag : MonoBehaviour {
         normalColor = zones[0].GetComponent<Renderer>().material.color;
 
         isDragFeatureOn = false;
+
+        // Fetching the config component
+        configInitializer = GameObject.FindObjectOfType<ConfigInitializer>();
+
+        // Allowing snaping from a larger distance when using the cave
+        if (configInitializer.GetDisplayDevice() == DisplayDevice.Cave) {
+            closeDistance = 0.15f;
+        }
+        else {
+            closeDistance = 0.1f;
+        }
     }
     
 
@@ -58,8 +73,8 @@ public class ObjectDrag : MonoBehaviour {
 
             isDragFeatureOn = true;
 
-            // Deactivate the physics
-            newobjectSelected.GetComponent<Rigidbody>().isKinematic = true;
+            // Syncing modification online
+            playerMoveObject.SyncObjectKinematic(newobjectSelected, true);
         } else {
             isDragFeatureOn = false;
 
@@ -69,7 +84,7 @@ public class ObjectDrag : MonoBehaviour {
 
 
     // The function called each frame to move the object
-    void MoveObject() {
+    void TrackSelectedObject() {
         if (isDragFeatureOn) {
             Vector3 newPos = deviceSelector.transform.position + deviceSelector.transform.forward * this.distance;
             Quaternion newRot = deviceSelector.transform.rotation;
@@ -81,7 +96,7 @@ public class ObjectDrag : MonoBehaviour {
 
             // Calling the synchronise online method to propagate the movement
             // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
-            playerMoveObject.moveObject(objectSelected, newPos, newRot);
+            playerMoveObject.MoveObject(objectSelected, newPos, newRot, false);
 
             foreach (GameObject zone in zones) {
                 Vector3 zonePosition = zone.transform.position;
@@ -122,15 +137,15 @@ public class ObjectDrag : MonoBehaviour {
 
                     // Calling the synchronise online method to propagate the movement
                     // THIS IS THE DIFFICULT PART OF THE UNITY NETWORK, see associated script for more infos
-                    playerMoveObject.moveObject(objectSelected, newPos, newRot);
+                    playerMoveObject.MoveObject(objectSelected, newPos, newRot, true);
                 }
-
                 // Resetting the color since the object is no longer held
                 zone.GetComponent<Renderer>().material.color = normalColor;
             } 
         }
-        // Activate the physics
-        objectSelected.GetComponent<Rigidbody>().isKinematic = false;
+
+        // Syncing modification online
+        playerMoveObject.SyncObjectKinematic(objectSelected, false);
 
         deviceSelector = null;
         objectSelected = null;
@@ -141,6 +156,6 @@ public class ObjectDrag : MonoBehaviour {
 
 
 	void Update () {
-        MoveObject();
+        TrackSelectedObject();
     } 
 }

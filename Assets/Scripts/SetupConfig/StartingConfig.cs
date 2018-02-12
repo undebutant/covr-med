@@ -17,7 +17,8 @@ public enum PlayerRole {
 /// </summary>
 public enum DisplayDevice {
     Cave,
-    Oculus
+    Oculus,
+    Monitor
 }
 
 
