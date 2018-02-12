@@ -1,39 +1,22 @@
-# covr-med
+# covr-med #
 
-GitHub repository with the Unity 5.1.1 code for the covr-med project with the IBISC laboratory.
-
-
-## To do list
-
-(Add there the details of the tasks to do in the current branch)
-
-* Create the working branches develop and hotfix
+GitHub repository with the Unity 5.6.1 code for the covr-med project with the IBISC laboratory.
 
 
-## Resources used
+## Dependencies ##
 
-Here are the dependencies, relevent links and the external resources used for this project.
-
-
-### Dependencies
-
-* [Unity 5.1.0](https://unity3d.com/fr/get-unity/download/archive)
+* [Unity 5.6.1](https://unity3d.com/fr/get-unity/download/archive)
 
 
-### Relevent links
+## Relevent links ##
 
 * [Tips for Unity](https://www.gamasutra.com/blogs/HermanTulleken/20160812/279100/50_Tips_and_Best_Practices_for_Unity_2016_Edition.php)
 * [Merge or Rebase?](https://www.atlassian.com/git/tutorials/merging-vs-rebasing)
 
 
-### External resources
+## About Git ##
 
-* None (for now...)
-
-
-## About Git
-
-### Branching
+### Branching ###
 
 To add a new branch in the local repository
 ```bash
@@ -56,7 +39,7 @@ git push -d origin name_of_the_branch_00x
 ```
 
 
-### Commiting
+### Commiting ###
 
 Adding all the changed / deleted / created files to the next commit
 ```bash
@@ -79,7 +62,7 @@ git commit --amend "Updated commit message"
 ```
 
 
-### Merging
+### Merging ###
 
 To merge a branch with a second one (fast-forward)
 ```bash
@@ -88,7 +71,7 @@ git merge name_of_the_branch_to_merge_from
 ```
 
 
-### Stashing
+### Stashing ###
 
 To keep safe a series of changes before a checkout
 ```bash
