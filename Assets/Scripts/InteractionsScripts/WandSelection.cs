@@ -199,7 +199,7 @@ public class WandSelection : MonoBehaviour {
                     GetComponent<VRWand>().SetRayColor(GetComponent<VRRaySelection>().HoverColor);
 
                     // Plays the hover sound 
-                    if(!isHoveringSelectableObject)
+                    if(!isHoveringSelectableObject && !isObjectSelected)
                         soundManager.PlayHoverSound(new Vector3(0, 0, 0));
 
                     isHoveringSelectableObject = true;
