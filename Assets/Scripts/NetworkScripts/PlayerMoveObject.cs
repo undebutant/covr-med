@@ -15,23 +15,28 @@ public class PlayerMoveObject : NetworkBehaviour {
 
     private NetworkIdentity objNetId;
 
-    [SerializeField]
-    [Tooltip("The time taken to lerp to the final destination")]
-    float lerpingTime;
+    private float journeyLengthLerp;
 
     [SerializeField]
-    [Tooltip("The time taken to slerp to the final orientation")]
-    float slerpingTime;
+    [Tooltip("The speed to lerp to the final destination")]
+    float lerpingSpeed;
+
+    [SerializeField]
+    [Tooltip("The speed to slerp to the final destination")]
+    float slerpingSpeed;
 
 
     private void LerpPosition(GameObject objectToMove, Vector3 targetPosition) {
         // Translate smoothly the object
-        objectToMove.transform.position = Vector3.Lerp(objectToMove.transform.position, targetPosition, Time.deltaTime * lerpingTime);
+        float distanceCovered = Time.deltaTime * lerpingSpeed;
+        float fractJourney = distanceCovered / journeyLengthLerp;
+        objectToMove.transform.position = Vector3.Lerp(objectToMove.transform.position, targetPosition, fractJourney);
     }
 
     private void SlerpRotation(GameObject objectToMove, Quaternion targetRotation) {
         // Rotate smoothly the object
-        objectToMove.transform.rotation = Quaternion.Slerp(objectToMove.transform.rotation, targetRotation, Time.deltaTime * slerpingTime);
+        float fractJourney = Time.deltaTime * slerpingSpeed;
+        objectToMove.transform.rotation = Quaternion.Slerp(objectToMove.transform.rotation, targetRotation, fractJourney);
     }
 
 
@@ -64,6 +69,7 @@ public class PlayerMoveObject : NetworkBehaviour {
     /// </summary>
     [ClientRpc]
     void RpcMove(GameObject obj,Vector3 pos, Quaternion rot) {
+        journeyLengthLerp = Vector3.Distance(obj.transform.position, pos);
         LerpPosition(obj, pos);
         SlerpRotation(obj, rot);
     }
